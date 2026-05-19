@@ -1,0 +1,15 @@
+import { domain, zodToValidator } from "@xndrjs/domain-zod";
+import { z } from "zod";
+
+export const {{pascalName}}Proof = domain
+  .proof(
+    "{{pascalName}}",
+    zodToValidator(
+      z.object({
+        // TODO: define proof baseline schema
+      }),
+    ),
+  )
+  .refineType((row): row is typeof row & { /* TODO */ } => {
+    return true;
+  });

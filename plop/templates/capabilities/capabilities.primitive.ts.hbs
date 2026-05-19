@@ -1,0 +1,7 @@
+import { domain } from "@xndrjs/domain-zod";
+
+export const {{pascalCapabilitiesName}}Capabilities = domain.capabilities
+  .forPrimitive<{{primitiveScalar}}>()
+  .methods(({ create }) => ({
+    // TODO: add capabilities
+  }));

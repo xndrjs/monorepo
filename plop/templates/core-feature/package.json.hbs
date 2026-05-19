@@ -1,0 +1,17 @@
+{
+  "name": "{{corePackageName featureName}}",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./models": "./models/index.ts",
+    "./operations": "./operations/index.ts",
+    "./use-cases": "./use-cases/index.ts",
+    "./ports": "./ports/index.ts"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "@xndrjs/domain": "{{xndrjsDomainVersion}}",
+    "@xndrjs/domain-zod": "{{xndrjsDomainZodVersion}}",
+    "zod": "{{zodVersion}}"
+  }
+}

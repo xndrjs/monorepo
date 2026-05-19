@@ -1,0 +1,12 @@
+import { domain, zodToValidator } from "@xndrjs/domain-zod";
+import { z } from "zod";
+
+export const {{pascalName}}Shape = domain.shape(
+  "{{pascalName}}",
+  zodToValidator(
+    z.object({
+      kind: z.literal("{{pascalName}}").default("{{pascalName}}"),
+      // TODO: define shape fields
+    }),
+  ),
+);

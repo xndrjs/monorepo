@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+coverage
+.next
+.turbo
+.nx
+pnpm-lock.yaml
+plop/templates/**/*.hbs

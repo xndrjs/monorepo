@@ -1,0 +1,38 @@
+// TODO: customize the request context, e.g. correlationId
+type RequestContext = never;
+
+/**
+ * Owns infrastructure wiring for this composition root.
+ *
+ * App-scoped dependencies live on this provider as fields or lazy getters.
+ *   Field example: `private readonly client = new FooAdapter(...);`
+ *   Lazy getter example: `private get client() { return (this._client ??= new FooAdapter(...)); }`
+ *
+ * Request-scoped dependencies must be created through methods that receive `RequestContext`.
+ *   Example: `getTicketRepository(ctx) { return new SqlTicketRepository(ctx.someProp); }`
+ *
+ * `getForContext(ctx)` returns the infrastructure slice required by use-case factories.
+ */
+class {{compositionRootPascalName compositionRootName}}InfrastructureProvider {
+  getForContext(_ctx: RequestContext) {
+    return {};
+  }
+}
+
+const infrastructureProvider = new {{compositionRootPascalName compositionRootName}}InfrastructureProvider();
+
+/**
+ * Returns the use cases wired for one request context.
+ *
+ * Example:
+ *   export function get{{compositionRootPascalName compositionRootName}}Root(ctx: RequestContext) {
+ *     const infrastructure = infrastructureProvider.getForContext(ctx);
+ *     return {
+ *       recordLineItem: createRecordLineItemUseCase({ ... }),
+ *     };
+ *   }
+ */
+export function get{{compositionRootPascalName compositionRootName}}Root(ctx: RequestContext) {
+  const _infrastructure = infrastructureProvider.getForContext(ctx);
+  return {};
+}

@@ -1,0 +1,13 @@
+// Run from repo root: pnpm test:node
+import { describe, expect, it } from "vitest";
+import { create{{pascalUseCaseName}}UseCase } from "./{{kebabUseCaseName}}.use-case";
+
+describe("{{pascalUseCaseName}}UseCase", () => {
+  it("is not implemented yet", async () => {
+    const run = create{{pascalUseCaseName}}UseCase({});
+
+    await expect(run()).rejects.toThrow("Not implemented: {{pascalUseCaseName}} use case");
+  
+    expect(false).toBe(true); // intentionally fails: remember to write real tests
+  });
+});

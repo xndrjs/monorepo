@@ -1,0 +1,15 @@
+/**
+ * Application use case.
+ *
+ * Wire it in the app composition root with `create{{pascalUseCaseName}}UseCase(deps)`.
+ * Use cases should not import each other.
+ */
+export interface {{pascalUseCaseName}}UseCaseDeps {
+  // Add required ports here.
+}
+
+export function create{{pascalUseCaseName}}UseCase(_deps: {{pascalUseCaseName}}UseCaseDeps) {
+  return async function {{camelUseCaseName}}() {
+    throw new Error("Not implemented: {{pascalUseCaseName}} use case");
+  };
+}
