@@ -1,5 +1,6 @@
 import type { NodePlopAPI } from "plop";
 import { toKebabCase } from "../common/casing.utils.ts";
+import { createPackageReadmeAction } from "../common/package-readme.utils.ts";
 import { createSyncTsconfigReferencesAction } from "../common/tsconfig-references.utils.ts";
 
 const CORE_LAYERS = ["models", "operations", "use-cases", "ports"] as const;
@@ -44,18 +45,28 @@ export function registerCorePackageGenerator(plop: NodePlopAPI): void {
         filter: normalizeFeatureName,
       },
     ],
-    actions: [
-      {
-        type: "addMany",
-        destination: "packages/{{corePackageFolder featureName}}",
-        base: "templates/core-feature",
-        templateFiles: "templates/core-feature/**",
-        abortOnFail: true,
-        data: {
-          layers: CORE_LAYERS,
+    actions: (answers) => {
+      const featureName = normalizeFeatureName(String(answers.featureName));
+      const destination = `packages/core-${featureName}`;
+
+      return [
+        {
+          type: "addMany",
+          destination,
+          base: "templates/core-feature",
+          templateFiles: "templates/core-feature/**",
+          abortOnFail: true,
+          data: {
+            featureName,
+            layers: CORE_LAYERS,
+          },
         },
-      },
-      createSyncTsconfigReferencesAction(),
-    ],
+        createPackageReadmeAction(
+          `${destination}/README.md`,
+          `@core/${featureName}`,
+        ),
+        createSyncTsconfigReferencesAction(),
+      ];
+    },
   });
 }

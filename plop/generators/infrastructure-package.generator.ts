@@ -1,5 +1,6 @@
 import type { NodePlopAPI } from "plop";
 import { toKebabCase } from "../common/casing.utils.ts";
+import { createPackageReadmeAction } from "../common/package-readme.utils.ts";
 import { createSyncTsconfigReferencesAction } from "../common/tsconfig-references.utils.ts";
 
 function normalizeInfrastructurePackageName(value: string): string {
@@ -46,15 +47,27 @@ export function registerInfrastructurePackageGenerator(
         filter: normalizeInfrastructurePackageName,
       },
     ],
-    actions: [
-      {
-        type: "addMany",
-        destination: "packages/{{infrastructurePackageFolder packageName}}",
-        base: "templates/infrastructure-package",
-        templateFiles: "templates/infrastructure-package/**",
-        abortOnFail: true,
-      },
-      createSyncTsconfigReferencesAction(),
-    ],
+    actions: (answers) => {
+      const packageName = normalizeInfrastructurePackageName(
+        String(answers.packageName),
+      );
+      const destination = `packages/infrastructure-${packageName}`;
+
+      return [
+        {
+          type: "addMany",
+          destination,
+          base: "templates/infrastructure-package",
+          templateFiles: "templates/infrastructure-package/**",
+          abortOnFail: true,
+          data: { packageName },
+        },
+        createPackageReadmeAction(
+          `${destination}/README.md`,
+          `@infrastructure/${packageName}`,
+        ),
+        createSyncTsconfigReferencesAction(),
+      ];
+    },
   });
 }

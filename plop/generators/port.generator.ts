@@ -1,15 +1,8 @@
 import type { NodePlopAPI } from "plop";
 import { appendExport } from "../common/barrel.utils.ts";
 import { toKebabCase, toPascalCase } from "../common/casing.utils.ts";
+import { stripTrailingPortLabel } from "../common/port-name.utils.ts";
 import { getCorePackageChoices } from "../common/workspace.utils.ts";
-
-function stripTrailingPortLabel(value: string): string {
-  return value
-    .trim()
-    .replace(/\s+port\s*$/i, "")
-    .replace(/[-_\s]*port\s*$/i, "")
-    .trim();
-}
 
 function validatePortName(value: string): true | string {
   const baseName = stripTrailingPortLabel(value);

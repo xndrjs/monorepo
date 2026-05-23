@@ -5,6 +5,10 @@ import { defineConfig } from "eslint/config";
 import boundaries from "eslint-plugin-boundaries";
 import checkFile from "eslint-plugin-check-file";
 import tseslint from "typescript-eslint";
+import {
+  incompleteDocTodoMarkdownConfig,
+  incompleteDocTodoPlugin,
+} from "./eslint/incomplete-doc-todo.js";
 
 const repoRoot = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,6 +19,11 @@ const sourceFiles = [
 const coreFiles = ["packages/core-*/**/*.{js,mjs,cjs,ts,tsx}"];
 const infrastructureFiles = [
   "packages/infrastructure-*/**/*.{js,mjs,cjs,ts,tsx}",
+];
+
+const docPlaceholderFiles = [
+  "apps/**/*.{js,mjs,cjs,ts,tsx}",
+  "packages/**/*.{js,mjs,cjs,ts,tsx}",
 ];
 
 export default defineConfig(
@@ -55,6 +64,24 @@ export default defineConfig(
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    files: docPlaceholderFiles,
+    plugins: {
+      "incomplete-doc-todo": incompleteDocTodoPlugin,
+    },
+    rules: {
+      "incomplete-doc-todo/no-placeholder": "warn",
+    },
+  },
+  {
+    ...incompleteDocTodoMarkdownConfig,
+    plugins: {
+      "incomplete-doc-todo": incompleteDocTodoPlugin,
+    },
+    rules: {
+      "incomplete-doc-todo/no-placeholder": "warn",
     },
   },
   {
@@ -230,7 +257,7 @@ export default defineConfig(
       "check-file/filename-blocklist": [
         "error",
         {
-          "packages/core-*/models/!(*.shape(.test)?|*.primitive(.test)?|*.proof(.test)?|index).ts":
+          "packages/core-*/models/!(*.shape(.test)?|*.test|*.primitive(.test)?|*.proof(.test)?|index).ts":
             "*.shape.ts, *.primitive.ts, *.proof.ts, colocated *.test.ts, or index.ts",
           "packages/core-*/types/!(*.types|index).ts": "*types.ts or index.ts",
           "packages/core-*/operations/!(*.capabilities(.test)?|*.service(.test)?|index).ts":
