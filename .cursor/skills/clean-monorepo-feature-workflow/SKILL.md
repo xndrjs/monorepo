@@ -1,6 +1,6 @@
 ---
 name: clean-monorepo-feature-workflow
-description: Step-by-step workflow for implementing a multi-layer feature in the clean-template monorepo—one phase per agent run with mandatory user checkpoint between phases; persist flow diagrams under top-level specs/ first (no implementation until agreed), then domain kits, capabilities, services, use cases, ports, infrastructure, composition. Use when a task spans @core, @infrastructure, and apps; enforces inside-out order, test gates, and hard stops on architecture violations.
+description: Step-by-step workflow for implementing a multi-layer feature in the clean-template monorepo—one phase per agent run with mandatory user checkpoint between phases; persist flow diagrams under top-level specs/ first (proof checks in alt/else labels e.g. UnlockedVaultProof.test(vault), not as a separate Note duplicating the branch; no XxxCapabilities.validate/create in specs). Use when a task spans @core, @infrastructure, and apps; enforces inside-out order, test gates, and hard stops on architecture violations.
 ---
 
 # Feature workflow (multi-layer)
@@ -44,6 +44,9 @@ Canonical architecture:
 
 - [ ] Which `@core/<feature>` (or `pnpm generate core-feature`)? See skill `clean-monorepo-core-package-design`.
 - [ ] List domain concepts → candidate `*.primitive.ts`, `*.shape.ts`, `*.proof.ts` files.
+- [ ] **Proofs** that branch flows: kit name + how the `alt` will read (e.g. `UnlockedVaultProof.test(vault)`).
+- [ ] **Capabilities** (if any): kit + **concrete method names**—never `validate`, `create`, or other kit-lifecycle names (see Phase 1 decision table).
+- [ ] **Services** cross-model (if any): e.g. hash verify, totals.
 - [ ] List external dependencies → candidate `*.port.ts` (names only; no SDK types).
 - [ ] Acceptance criteria in **domain language**, not vendor APIs.
 
@@ -98,28 +101,48 @@ Use concrete names: `@core/checkout`, `@core/inventory`, `@infrastructure/conten
 
 ### Message types
 
-| From                  | To                    | Notation                            | Meaning                                                                                      |
-| --------------------- | --------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------- |
-| `app`                 | `@core/<feature>`     | Arrow, **use-case name**            | App invokes the use case                                                                     |
-| `@core/<feature>`     | `@core/<feature>`     | Self-call (optional)                | Use case orchestrates domain (internal processing)                                           |
-| `@core/<feature>`     | _(same lifeline)_     | **`Note over core`**                | Models, capabilities, services touched in domain (not separate participants)                 |
-| `@core/<feature>`     | `@core/<feature>`     | **`loop`**                          | **Only** when there is real iteration (e.g. over a collection)—not for ordinary domain steps |
-| `@core/<feature>`     | _(branching)_         | **`alt` / `else`**                  | **Proofs** (or other domain rules) that change the flow path                                 |
-| `@core/<feature>`     | `@infrastructure/...` | Arrow, **port/adapter method name** | Core calls a port                                                                            |
-| `@infrastructure/...` | external service      | Arrow, **vendor operation**         | Infra delegates to the outside world                                                         |
+| From                  | To                    | Notation                            | Meaning                                                                                            |
+| --------------------- | --------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `app`                 | `@core/<feature>`     | Arrow, **use-case name**            | App invokes the use case                                                                           |
+| `@core/<feature>`     | `@core/<feature>`     | Self-call (optional)                | Use case orchestrates domain (internal processing)                                                 |
+| `@core/<feature>`     | _(same lifeline)_     | **`Note over core`**                | Models, capabilities, services touched in domain (not separate participants)                       |
+| `@core/<feature>`     | `@core/<feature>`     | **`loop`**                          | **Only** when there is real iteration (e.g. over a collection)—not for ordinary domain steps       |
+| `@core/<feature>`     | _(branching)_         | **`alt` / `else`**                  | **Proof checks** and other domain guards that change the flow path—the `alt` label names the check |
+| `@core/<feature>`     | `@infrastructure/...` | Arrow, **port/adapter method name** | Core calls a port                                                                                  |
+| `@infrastructure/...` | external service      | Arrow, **vendor operation**         | Infra delegates to the outside world                                                               |
 
 Return arrows (`-->>`) are optional; use them when success/error responses matter for the flow.
 
 **Domain inside core (default):**
 
-- After `app` → `core`, use **`Note over core`** to list shape/primitive validation, capability steps, and `*.service.ts` calls (e.g. `Note over core: CartCapabilities.validate`, `Note over core: compute total (order-totals.service)`).
+- After `app` → `core`, use **`Note over core`** for kit **creation** (`XxxShape.create`, `XxxPrimitive.create`), **custom capability methods**, and **`*.service.ts`** (e.g. `Note over core: VaultEntryShape.create(input)`, `Note over core: VaultEntryCapabilities.redactSecret(entry)`, `Note over core: verify hash (vault.service)`).
 - Use a **`core` → `core` self-call** only when you want to stress use-case → domain orchestration as a distinct step—not as a substitute for `loop`.
 - Use **`loop`** only when the business flow truly repeats (N items, paginated fetch, retry batch, etc.).
 
+### Specs notation — decision table
+
+| Business rule                                                                                               | Artifact                                                  | In `sequenceDiagram`                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Structure / field constraints at input boundary                                                             | `XxxShape.create` / `XxxPrimitive.create` (Zod in kit)    | `Note over core: VaultEntryShape.create(input)` inside the success branch                                                                            |
+| **Additional guarantee** on already-valid data (state, authorization, semantic invariant—even on one field) | `*.proof.ts` (`refineType`; `test` / `assert` on kit API) | **`alt` / `else` label names the proof check**, e.g. `alt UnlockedVaultProof.test(vault)` — not a separate `Note` that duplicates the same branch    |
+| Custom behavior beyond create/validation on one kit                                                         | `*.capabilities.ts`                                       | `Note over core: XxxCapabilities.<domainVerb>(…)` — **never** `validate` or `create` (kit lifecycle); use domain verbs (`rename`, `redactSecret`, …) |
+| Rule across two+ kits (same feature)                                                                        | `*.service.ts`                                            | `Note over core: <description> (<name>.service)`                                                                                                     |
+| Orchestration + I/O                                                                                         | `*.use-case.ts` + port                                    | `app→core` use-case name; `core→infra` port method                                                                                                   |
+
+Skill detail: `clean-monorepo-core-models` (proofs), `clean-monorepo-core-capabilities` (forbidden capability names).
+
+### Diagram anti-patterns (reject in Phase 1)
+
+- **`Note over core: XxxProof.test`** immediately followed by **`alt vault is unlocked`** — the proof check must **be** the `alt` condition (e.g. `alt UnlockedVaultProof.test(vault)`), not a duplicate step.
+- **`XxxCapabilities.validate`** / **`XxxCapabilities.create`** — creation and structural validation belong to shapes/primitives, not capabilities.
+- Proof or capability as a **separate participant** in the diagram.
+- Generic `alt` labels with no link to the guard when a **proof** is the domain gate (prefer `VerifiedUserProof.test(user)` over a vague `alt user is ok` unless the proof name adds no value).
+
 **Proofs and branching:**
 
-- When a **proof** (or equivalent domain guard) selects different outcomes, model it with **`alt` / `else`** on the `core` lifeline—not a generic note.
-- Label branches in domain language (e.g. `user is verified` / `user is NOT verified`) and name the proof in a preceding note if helpful (`Note over core: Proof check: VerifiedUser`).
+- When a **proof** gates the flow, the **`alt` condition is the proof check** (e.g. `alt UnlockedVaultProof.test(vault)` / `else vault is locked`).
+- On the **success path that establishes** a proof, use a note with **`assert`** (e.g. `Note over core: UnlockedVaultProof.assert(vault)` after password match).
+- Non-proof guards (e.g. password hash match via service) may use domain-language `alt` labels; still avoid a redundant note + `alt` for the same decision.
 
 ### Example (proof + port)
 
@@ -131,9 +154,7 @@ sequenceDiagram
 
     app->>core: SendSensitiveEmail(user)
 
-    Note over core: Proof check: VerifiedUser
-
-    alt user is verified
+    alt VerifiedUserProof.test(user)
         core->>infra: sendEmail()
         infra-->>core: ok
         core-->>app: success
@@ -153,7 +174,7 @@ sequenceDiagram
 
     app->>core: SettleOrder(order)
 
-    Note over core: OrderCapabilities.validate(order)
+    Note over core: OrderShape.create(raw)
     Note over core: allocate line totals (order-totals.service)
 
     loop for each payment line
@@ -170,10 +191,11 @@ From the saved `specs/` files you should know:
 
 - [ ] Which **use cases** exist (labels on `app` → `core`).
 - [ ] Which **models / capabilities / services** are involved (`Note over core`; real **`loop`** only if iterative).
-- [ ] Which **proofs** (or guards) branch the flow (`alt` / `else`).
+- [ ] Which **proofs** branch the flow—the **`alt` label** names the check (e.g. `UnlockedVaultProof.test(vault)`), not a lone `Note` duplicating that branch.
 - [ ] Which **ports** and **adapter methods** are needed (labels on `core` → `infra`).
 - [ ] Which **infrastructure packages** and **external systems** are involved.
 - [ ] Layer boundaries are valid (no `app` → infra, no external service called from core).
+- [ ] Phase 1 **anti-patterns** checklist passed (no `Capabilities.validate`/`create`; no duplicate proof note + `alt`).
 
 **Gate:** user agreement · **all** agreed diagrams committed under `specs/` (top-level by default) · no implementation code yet · **stop — wait for user before Phase 2**
 

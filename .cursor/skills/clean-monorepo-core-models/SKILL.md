@@ -1,6 +1,6 @@
 ---
 name: clean-monorepo-core-models
-description: Implements or reviews *.shape.ts, *.primitive.ts, and *.proof.ts domain kits in @core packages of the clean-template monorepo. Use when creating shapes, primitives, proofs with @xndrjs/domain-zod, or running pnpm generate shape|primitive|proof.
+description: Implements or reviews *.shape.ts, *.primitive.ts, and *.proof.ts domain kits in @core packages. Proofs add guarantees on already-valid data (refineType); specs use alt UnlockedVaultProof.test(v) not a separate Note duplicating the branch. Use when creating kits or running pnpm generate shape|primitive|proof.
 ---
 
 # Core domain kits (`models/`)
@@ -55,6 +55,31 @@ export const EmailPrimitive = domain.primitive(
 
 ## Proof (`*.proof.ts`)
 
+### When to use a proof
+
+A proof expresses an **additional domain guarantee** on data that is already structurally valid (via `XxxShape.create` / `XxxPrimitive.create` or equivalent). Typical cases:
+
+- Session/state invariants (`UnlockedVault`, vault unlocked for CRUD).
+- Authorization or role semantics on an entity.
+- Stronger invariants on a single field **after** creation—e.g. “this email is verified”, not “this string parses as email”.
+
+**Not** a substitute for input construction: required fields, formats, and bounds at the boundary stay on **shapes/primitives** (Zod in `create`).
+
+A proof may apply to a whole shape **or** a narrow refinement; scope is driven by domain language, not file count.
+
+### Proofs in `specs/` (Phase 1)
+
+When a proof **gates** a flow, the Mermaid **`alt` condition is the proof check**, for example:
+
+```txt
+alt UnlockedVaultProof.test(vault)
+  ...
+else vault is locked
+  ...
+```
+
+Do **not** add `Note over core: UnlockedVaultProof.test` and then a separate `alt vault is unlocked` for the same decision. See skill `clean-monorepo-feature-workflow` (Phase 1).
+
 ```ts
 import { domain, zodToValidator } from "@xndrjs/domain-zod";
 import { z } from "zod";
@@ -89,10 +114,10 @@ export const VerifiedUserProof = domain
 
 ## Kit vs capabilities
 
-| Layer         | Responsibility                       |
-| ------------- | ------------------------------------ |
-| `models/`     | Structure, validation, proofs        |
-| `operations/` | Behavior on kits (`XxxCapabilities`) |
+| Layer         | Responsibility                                                                     |
+| ------------- | ---------------------------------------------------------------------------------- |
+| `models/`     | Structure; **create** + structural validation (Zod); **proofs** (extra guarantees) |
+| `operations/` | **Custom** methods on kits beyond create/validation (`XxxCapabilities`)            |
 
 Scaffold capabilities after shapes/primitives exist; see skill `clean-monorepo-core-capabilities`.
 
@@ -101,6 +126,8 @@ Scaffold capabilities after shapes/primitives exist; see skill `clean-monorepo-c
 - Re-introducing `*.model.ts` or `XxxModel.schema` patterns.
 - Deep-importing another feature’s kit file.
 - Framework or infrastructure imports in `models/`.
+- Using a proof only to duplicate what `Shape.create` / `Primitive.create` already enforces at input time.
+- Modelling a proof-gated branch in specs as `Note: XxxProof.test` plus a generic `alt` that does not name the same check.
 
 ## Tests
 

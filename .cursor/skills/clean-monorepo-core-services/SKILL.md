@@ -39,7 +39,7 @@ export function calculateLineTotal(item: LineItem, rule: TaxRule) {
 }
 ```
 
-Callers (use cases) pass **already validated** domain values (`XxxShape.create` / capabilities upstream).
+Callers (use cases) pass **already validated** domain values (`XxxShape.create` / `XxxPrimitive.create` upstream; proofs where an extra guarantee applies).
 
 ## Tests
 

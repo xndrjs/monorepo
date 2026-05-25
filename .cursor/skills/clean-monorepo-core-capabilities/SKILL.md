@@ -1,15 +1,17 @@
 ---
 name: clean-monorepo-core-capabilities
-description: Implements or reviews *.capabilities.ts files using domain.capabilities.forShape/forPrimitive in @core operations layers. Use when adding domain behavior on shapes or primitives, .attach to kits, or running pnpm generate capabilities—preferred over scattering domain logic across the monorepo.
+description: Implements or reviews *.capabilities.ts — custom domain methods on one kit beyond create/validation (never validate/create on capabilities; those belong to Shape/Primitive.create). Use when adding forShape/forPrimitive custom behavior or pnpm generate capabilities.
 ---
 
 # Core capabilities (operations)
 
 ## Preferred way to work on domain kits
 
-Capabilities are the **preferred** way to implement behavior on domain kits (`*.shape.ts`, `*.primitive.ts`).
+Capabilities are the **preferred** way to implement **custom domain behavior** on domain kits (`*.shape.ts`, `*.primitive.ts`) — operations that go **beyond** kit `create` and the structural validation bundled with creation.
 
-Whenever logic mutates or derives values held by a shape or primitive kit, implement it in a matching `*.capabilities.ts` file—not ad hoc in use cases, apps, or infrastructure.
+Whenever logic mutates or derives values on an **already constructed** kit instance, implement it in a matching `*.capabilities.ts` file — not ad hoc in use cases, apps, or infrastructure.
+
+**Not capabilities:** `create`, `validate`, or any method that only mirrors shape/primitive construction or Zod parsing—that stays on **`XxxShape` / `XxxPrimitive`** in `models/`. **Not capabilities:** flow gates that need a proof (`UnlockedVaultProof.test`) or cross-kit rules (`*.service.ts`).
 
 **Why:** each capability kit exposes `XxxCapabilities` with typed `methods` and `.attach` to the domain kit. Add `.attach` manually in `operations/` after generate—not in composition. Use cases import `XxxCapabilities` from `@core/<feature>/operations`.
 
@@ -90,8 +92,14 @@ import { pipe } from "remeda";
 import { UserShape } from "../models/user.shape.js";
 import { UserCapabilities } from "./user.capabilities.js";
 
-const verified = pipe(raw, UserShape.create, UserCapabilities.verify);
+const renamed = pipe(raw, UserShape.create, UserCapabilities.rename);
 ```
+
+### Specs notation (Phase 1)
+
+List real capability methods in notes, e.g. `Note over core: UserCapabilities.rename(user, name)`.
+
+**Forbidden in diagrams and code:** `XxxCapabilities.validate`, `XxxCapabilities.create`, or other names that duplicate kit lifecycle. Use `XxxShape.create(input)` / `XxxPrimitive.create(value)` in notes instead.
 
 ## Rules
 
@@ -103,6 +111,7 @@ const verified = pipe(raw, UserShape.create, UserCapabilities.verify);
 ## Anti-patterns
 
 - Domain rules on kit values **outside** capabilities (e.g. only in a use case or React component).
+- Capability methods named **`validate`**, **`create`**, or equivalent kit-lifecycle aliases — use the shape/primitive kit.
 - `createXCapabilities(XxxModel.from)` or composition-time capability binding (legacy pattern).
 - Importing `@infrastructure/*` or UI in capabilities.
 - Exporting capabilities that orchestrate use cases (belongs in `use-cases/`).
