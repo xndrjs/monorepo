@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "plop": {
+      "command": "pnpm",
+      "args": ["mcp:plop"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}

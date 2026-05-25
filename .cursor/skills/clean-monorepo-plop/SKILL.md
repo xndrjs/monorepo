@@ -16,11 +16,28 @@ Prefer generators over copying files by hand for:
 
 Run: `pnpm generate` or `pnpm generate <generator-name>`.
 
+## Agent / non-interactive mode (MCP)
+
+When scaffolding without a TTY (Cursor agent, CI, Copilot agent), **use the Plop MCP server** — do not pipe stdin into `pnpm generate` (list prompts fail in non-TTY shells).
+
+**Tools:** `plop_list_generators` → `plop_describe_generator` → `plop_run_generator`
+
+**Rules:**
+
+- Use **list prompt `value`s** from `plop_describe_generator` (e.g. `packages/core-todos`), not display labels (`@core/todos - packages/core-todos`).
+- Check `when.requires` on conditional prompts (e.g. `primitiveScalar` only when `capabilitiesBase` is `primitive`).
+- Inspect `failures` and `validationErrors` in the run result; do not assume success from empty output.
+
+Config: [`.cursor/mcp.json`](../../../.cursor/mcp.json) (Cursor) or [`.vscode/mcp.json`](../../../.vscode/mcp.json) (VS Code + Copilot). Server entry: `pnpm mcp:plop`.
+
+Humans can still use interactive `pnpm generate`.
+
 ## Layout
 
 ```txt
 plop/
   plopfile.cjs              # registers generators (tsx/cjs)
+  mcp/                      # MCP server for agent-mode scaffolding
   generators/*.generator.ts
   templates/**                # .hbs templates
   common/                     # casing, barrel, zod/xndrjs version utils

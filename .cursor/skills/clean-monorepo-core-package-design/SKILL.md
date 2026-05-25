@@ -72,9 +72,10 @@ ESLint allows `core-models` → `core-models` **across** different `@core/*` pac
 
 ## Checklist before `pnpm generate core-feature`
 
+- [ ] At least one **agreed** flow diagram is saved under top-level [`specs/`](../../../specs/) (skill `clean-monorepo-feature-workflow`, Phase 1)—no implementation code before that. Use `packages/core-<feature>/specs/` only if the user explicitly requested package-local specs.
 - [ ] Feature name reflects **business** language (kebab-case).
 - [ ] You can list the main domain concepts (candidate `*.shape.ts` / `*.primitive.ts` / `*.proof.ts` files).
-- [ ] You know which outward dependencies are ports (candidate `*.port.ts`).
+- [ ] You know which outward dependencies are ports (candidate `*.port.ts`)—labels should match the diagram’s `core` → `infra` arrows.
 - [ ] The slice is not “half the application” in one package.
 - [ ] No framework, UI, or infrastructure imports inside core.
 

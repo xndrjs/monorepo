@@ -141,6 +141,39 @@ pnpm generate port
 pnpm generate use-case
 ```
 
+### Plop MCP (agent mode)
+
+For non-interactive scaffolding (Cursor agents, GitHub Copilot in VS Code), use the **Plop MCP server** instead of piping answers into `pnpm generate`.
+
+**Enable the server**
+
+| IDE               | Config file                            |
+| ----------------- | -------------------------------------- |
+| Cursor            | [`.cursor/mcp.json`](.cursor/mcp.json) |
+| VS Code + Copilot | [`.vscode/mcp.json`](.vscode/mcp.json) |
+
+Both run `pnpm mcp:plop` (stdio). Reload the window or restart MCP after changing config.
+
+**Agent workflow**
+
+1. `plop_list_generators` — discover generator names
+2. `plop_describe_generator` — read prompts and **list `value`s** (e.g. `packages/core-todos`, not the display label)
+3. `plop_run_generator` — run with `{ generator, answers }`
+
+Example (add a port to `@core/todos`):
+
+```json
+{
+  "generator": "port",
+  "answers": {
+    "corePackageRel": "packages/core-todos",
+    "portName": "todos-repository"
+  }
+}
+```
+
+Do **not** use stdin pipes with `pnpm generate` in agent/CI contexts; list prompts require exact `value`s from `plop_describe_generator`.
+
 The generated core package has the fixed layer structure:
 
 ```txt

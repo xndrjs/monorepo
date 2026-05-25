@@ -120,6 +120,6 @@ Customize `RequestContext` at the top of the file to match the app (Next request
 ## Related
 
 - Domain capabilities wiring: skill `clean-monorepo-core-capabilities`.
-- Multi-layer order: skill `clean-monorepo-feature-workflow` (Phase 5).
+- Multi-layer order: skill `clean-monorepo-feature-workflow` (Phase 6).
 - Scaffold: skill `clean-monorepo-plop`.
 - Boundaries: skill `clean-monorepo-boundaries`.

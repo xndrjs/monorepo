@@ -16,9 +16,11 @@
     "test:watch": "vitest",
     "test:node": "vitest run --project node",
     "test:react": "vitest run --project react",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "mcp:plop": "tsx plop/mcp/server.ts"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.0",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.4.0",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -27,11 +29,13 @@
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.5",
+    "node-plop": "^0.32.3",
     "plop": "^4.0.5",
     "prettier": "^3.8.3",
     "tsx": "^4.22.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "zod": "^4.4.3"
   }
 }

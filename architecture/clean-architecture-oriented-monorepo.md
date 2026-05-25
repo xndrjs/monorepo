@@ -54,6 +54,9 @@ apps/
     composition/          # composition root (required)
     package.json
 
+specs/                    # flow diagrams (Mermaid) — user/app stories; not imported by code
+  checkout-settle-order.md
+
 packages/
   core-billing/           # @core/billing
     types/
@@ -117,6 +120,14 @@ Functional core of a feature or bounded context.
 **Package name:** `@core/<feature>` (e.g. `packages/core-billing` → `@core/billing`)
 
 Each core package is a **vertical slice** (`models`, `operations`, `use-cases`, `ports`) for one bounded context—not a technical or horizontal split.
+
+### `specs/` (flow and planning diagrams)
+
+**Default:** top-level [`specs/`](../specs/) at the monorepo root holds **Mermaid source** for user-facing flows and other planning diagrams agreed during planning (e.g. `sequenceDiagram`). A flow describes an **app story** and may involve **multiple** `@core/*` packages (separate lifelines per core)—so specs are **not** tied to a single `packages/core-<feature>/` folder unless the user explicitly chooses package-local specs.
+
+Domain notation on diagrams: capabilities and services as `Note over` the relevant `@core/*` lifeline; proofs as `alt`/`else`; `loop` only when the flow truly iterates. Files are versioned like code; they are **not** imported at runtime and are **not** package exports. Phase 1 of the feature workflow delivers these artifacts **before** `models/` or other implementation layers. Agent guide: skill `clean-monorepo-feature-workflow`.
+
+**Optional override:** `packages/core-<feature>/specs/` only when the user explicitly scopes diagrams to one bounded context and wants them colocated with that package.
 
 ### Package sizing and naming
 
@@ -437,12 +448,15 @@ packages/
 
 ## End-to-end feature workflow
 
-When a change spans domain, application, infrastructure, and composition, work **inside-out**:
+When a change spans domain, application, infrastructure, and composition:
 
-1. Domain kits in `models/` (primitive → shape → proof) and capabilities/services in `operations/` with colocated tests.
-2. Ports + use cases with fake port stubs—no real adapters in core tests.
-3. Infrastructure adapters, mappers, and mapper unit tests.
-4. App `composition/` wiring only after core contracts are stable.
+**Agent checkpoint rule:** Phases run **serially** (discovery → specs → models → operations → use cases → infrastructure → composition). **One phase per agent run**; after each phase, the agent **stops** and waits for **explicit user confirmation** before the next. Completing every phase in a single run or single prompt is **not allowed**. Details: skill `clean-monorepo-feature-workflow` (_One phase per run_).
+
+1. **Model each flow first** as Mermaid in top-level `specs/*.md` (`sequenceDiagram` and any other planning diagrams agreed with the user). Participants: `app` → one or more `@core/<feature>` lifelines → `@infrastructure/<name>` → optional external service. Notation: use-case (`app` → core); domain models/capabilities/services as `Note over` the relevant core; **`loop` only for real iteration**; proof branching as `alt`/`else`; port/adapter method (`core` → infra); vendor call (`infra` → external). Diagrams are **versioned repo source**, not chat-only. **No implementation code** until diagrams are clear, agreed, and saved under `specs/`. Package-local `packages/core-<feature>/specs/` only if the user explicitly requests it.
+2. Domain kits in `models/` (primitive → shape → proof) and capabilities/services in `operations/` with colocated tests.
+3. Ports + use cases with fake port stubs—no real adapters in core tests (names aligned with the diagram).
+4. Infrastructure adapters, mappers, and mapper unit tests.
+5. App `composition/` wiring only after core contracts are stable.
 
 If a layer cannot be expressed without leaking infrastructure into core, **stop** and split or clarify the task—do not ship an architecture violation.
 
@@ -488,14 +502,14 @@ The hard part is not folder names—it is **preventing accidental cross-layer im
 
 ### Cursor skills (task-specific; load via @ or narrow intent)
 
-| Skill                                                                                               | Use for                                           |
-| --------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| [clean-architecture-monorepo](../.cursor/skills/clean-architecture-monorepo/SKILL.md)               | Router when context is ambiguous                  |
-| [clean-monorepo-feature-workflow](../.cursor/skills/clean-monorepo-feature-workflow/SKILL.md)       | Multi-layer feature implementation order          |
-| [clean-monorepo-composition-root](../.cursor/skills/clean-monorepo-composition-root/SKILL.md)       | App composition, app- vs request-scoped wiring    |
-| [clean-monorepo-core-package-design](../.cursor/skills/clean-monorepo-core-package-design/SKILL.md) | Core package naming and sizing                    |
-| [clean-monorepo-boundaries](../.cursor/skills/clean-monorepo-boundaries/SKILL.md)                   | ESLint boundaries and imports                     |
-| [clean-monorepo-plop](../.cursor/skills/clean-monorepo-plop/SKILL.md)                               | Plop generators and templates                     |
-| [clean-monorepo-core-models](../.cursor/skills/clean-monorepo-core-models/SKILL.md)                 | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`      |
-| [clean-monorepo-core-capabilities](../.cursor/skills/clean-monorepo-core-capabilities/SKILL.md)     | `*.capabilities.ts` (`forShape` / `forPrimitive`) |
-| [clean-monorepo-core-services](../.cursor/skills/clean-monorepo-core-services/SKILL.md)             | `*.service.ts` cross-model domain logic           |
+| Skill                                                                                               | Use for                                              |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [clean-architecture-monorepo](../.cursor/skills/clean-architecture-monorepo/SKILL.md)               | Router when context is ambiguous                     |
+| [clean-monorepo-feature-workflow](../.cursor/skills/clean-monorepo-feature-workflow/SKILL.md)       | Flow diagrams first, then multi-layer implementation |
+| [clean-monorepo-composition-root](../.cursor/skills/clean-monorepo-composition-root/SKILL.md)       | App composition, app- vs request-scoped wiring       |
+| [clean-monorepo-core-package-design](../.cursor/skills/clean-monorepo-core-package-design/SKILL.md) | Core package naming and sizing                       |
+| [clean-monorepo-boundaries](../.cursor/skills/clean-monorepo-boundaries/SKILL.md)                   | ESLint boundaries and imports                        |
+| [clean-monorepo-plop](../.cursor/skills/clean-monorepo-plop/SKILL.md)                               | Plop generators and templates                        |
+| [clean-monorepo-core-models](../.cursor/skills/clean-monorepo-core-models/SKILL.md)                 | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`         |
+| [clean-monorepo-core-capabilities](../.cursor/skills/clean-monorepo-core-capabilities/SKILL.md)     | `*.capabilities.ts` (`forShape` / `forPrimitive`)    |
+| [clean-monorepo-core-services](../.cursor/skills/clean-monorepo-core-services/SKILL.md)             | `*.service.ts` cross-model domain logic              |

@@ -110,5 +110,5 @@ Colocate `models/<name>.test.ts` when validation, composition, or `refineType` g
 
 - Capabilities: skill `clean-monorepo-core-capabilities`.
 - Cross-model rules: skill `clean-monorepo-core-services`.
-- Multi-layer order: skill `clean-monorepo-feature-workflow`.
+- Multi-layer order: skill `clean-monorepo-feature-workflow` (Phase 2+; agree Phase 1 sequence diagrams first).
 - New core package: skill `clean-monorepo-plop` (`core-feature` generator).
