@@ -122,6 +122,7 @@ Available generators:
 - `proof`: creates a domain proof kit under an existing core package (`*.proof.ts`).
 - `capabilities`: creates domain capabilities under an existing core package (`*.capabilities.ts`).
 - `port`: creates a port interface under an existing core package.
+- `domain-error`: creates a domain error class under `errors/<kebab>.error.ts` (code: `SCREAMING_SNAKE_CASE`, message: sentence case).
 - `use-case`: creates a use case under an existing core package.
 
 Root `tsconfig.json` `references` are synced by `pnpm sync-tsconfig-references` (see [TypeScript project references](#typescript-project-references)), not by a Plop generator.
@@ -138,6 +139,7 @@ pnpm generate shape       # e.g. user
 pnpm generate capabilities
 pnpm generate proof
 pnpm generate port
+pnpm generate domain-error
 pnpm generate use-case
 ```
 
@@ -382,6 +384,7 @@ Skills in `.skills/`:
 | Skill                                | Scope                                             |
 | ------------------------------------ | ------------------------------------------------- |
 | `clean-architecture-monorepo`        | Router + link to full architecture doc            |
+| `clean-monorepo-spec-map`            | Product → spec map before per-spec SPEC/DESIGN    |
 | `clean-monorepo-feature-workflow`    | Multi-layer feature implementation                |
 | `clean-monorepo-composition-root`    | App composition wiring (generator-only)           |
 | `clean-monorepo-core-package-design` | Core package naming and bounded context           |

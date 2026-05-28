@@ -17,13 +17,14 @@
 
 **Core layer import rules (within the same feature package):**
 
-| From layer    | May import                                                 |
-| ------------- | ---------------------------------------------------------- |
-| `types/`      | `types/` only                                              |
-| `models/`     | `models/`, `types/`                                        |
-| `operations/` | `models/`, `operations/`, `types/`                         |
-| `ports/`      | `models/`, `ports/`, `types/`                              |
-| `use-cases/`  | `models/`, `operations/`, `ports/`, `use-cases/`, `types/` |
+| From layer    | May import                                                            |
+| ------------- | --------------------------------------------------------------------- |
+| `types/`      | `types/` only                                                         |
+| `errors/`     | `errors/` only                                                        |
+| `models/`     | `models/`, `types/`                                                   |
+| `operations/` | `models/`, `operations/`, `types/`                                    |
+| `ports/`      | `models/`, `ports/`, `types/`                                         |
+| `use-cases/`  | `models/`, `operations/`, `ports/`, `use-cases/`, `types/`, `errors/` |
 
 **Hard bans:**
 
@@ -152,6 +153,7 @@ Agent guide: skill `clean-monorepo-core-package-design`.
 | Layer         | Responsibility                                                   | Filename convention                                                             |
 | ------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | `types/`      | Internal shared types for this feature only (not public exports) | `*.types.ts`, `index.ts`                                                        |
+| `errors/`     | Domain error classes thrown by use cases (not public exports)    | `*.error.ts`, `index.ts`                                                        |
 | `models/`     | Domain shapes, primitives, proofs (xndrjs domain kits)           | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, colocated `*.test.ts`, `index.ts` |
 | `operations/` | Domain capabilities and cross-model domain services (pure logic) | `*.capabilities.ts`, `*.service.ts`, colocated `*.test.ts`, `index.ts`          |
 | `use-cases/`  | Application orchestration; coordinates domain + ports            | `*.use-case.ts`, `*.use-case.test.ts`, `index.ts`                               |
@@ -246,10 +248,11 @@ Agent guide: skill `clean-monorepo-core-services`.
 ### Cross-layer dependencies (same package)
 
 ```txt
+errors      → errors
 models      → models, types
 operations  → models, operations, types
 ports       → models, ports, types
-use-cases   → models, operations, ports, use-cases, types
+use-cases   → models, operations, ports, use-cases, types, errors
 ```
 
 `models/` MUST NOT import `operations/`, `use-cases/`, or `ports/`.
@@ -384,18 +387,19 @@ Default rule: **disallow** all other cross-element imports.
 
 Run: `pnpm generate` or `pnpm generate <name>`.
 
-| Generator                | Creates                                                                                   |
-| ------------------------ | ----------------------------------------------------------------------------------------- |
-| `core-feature`           | New `packages/core-<feature>/` with layers, `@xndrjs/domain`, `@xndrjs/domain-zod`, `zod` |
-| `shape`                  | `models/<name>.shape.ts` + barrel export                                                  |
-| `primitive`              | `models/<name>.primitive.ts` + barrel; base scalar: string \| number \| boolean           |
-| `proof`                  | `models/<name>.proof.ts` + barrel; `refineType` stub (brand from proof name)              |
-| `capabilities`           | `operations/<name>.capabilities.ts` + barrel; base: shape \| primitive (`.attach` manual) |
-| `port`                   | `ports/<name>.port.ts` + empty interface                                                  |
-| `use-case`               | `use-cases/<name>.use-case.ts` + **always** `*.use-case.test.ts` (Vitest `node`)          |
-| `infrastructure-package` | `packages/infrastructure-<name>/` with root `index.ts`                                    |
-| `ui-package`             | `packages/ui-<name>/`; optional Vitest test (`react` default, `node` optional)            |
-| `composition-root`       | `apps/<app>/composition/<app>.composition.ts`                                             |
+| Generator                | Creates                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| `core-feature`           | New `packages/core-<feature>/` with layers, `@xndrjs/domain`, `@xndrjs/domain-zod`, `zod`         |
+| `shape`                  | `models/<name>.shape.ts` + barrel export                                                          |
+| `primitive`              | `models/<name>.primitive.ts` + barrel; base scalar: string \| number \| boolean                   |
+| `proof`                  | `models/<name>.proof.ts` + barrel; `refineType` stub (brand from proof name)                      |
+| `capabilities`           | `operations/<name>.capabilities.ts` + barrel; base: shape \| primitive (`.attach` manual)         |
+| `port`                   | `ports/<name>.port.ts` + empty interface                                                          |
+| `domain-error`           | `errors/<name>.error.ts` + barrel; `errorCode` SCREAMING_SNAKE_CASE, `errorMessage` sentence case |
+| `use-case`               | `use-cases/<name>.use-case.ts` + **always** `*.use-case.test.ts` (Vitest `node`)                  |
+| `infrastructure-package` | `packages/infrastructure-<name>/` with root `index.ts`                                            |
+| `ui-package`             | `packages/ui-<name>/`; optional Vitest test (`react` default, `node` optional)                    |
+| `composition-root`       | `apps/<app>/composition/<app>.composition.ts`                                                     |
 
 Generator code: `plop/generators/`, templates: `plop/templates/`, entry: `plop/plopfile.cjs`.
 
@@ -514,6 +518,7 @@ The hard part is not folder names—it is **preventing accidental cross-layer im
 | Skill                                                                                        | Use for                                              |
 | -------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | [clean-architecture-monorepo](../.skills/clean-architecture-monorepo/SKILL.md)               | Router when context is ambiguous                     |
+| [clean-monorepo-spec-map](../.skills/clean-monorepo-spec-map/SKILL.md)                       | Decompose product into specs before god-specs        |
 | [clean-monorepo-feature-workflow](../.skills/clean-monorepo-feature-workflow/SKILL.md)       | Flow diagrams first, then multi-layer implementation |
 | [clean-monorepo-composition-root](../.skills/clean-monorepo-composition-root/SKILL.md)       | App composition, app- vs request-scoped wiring       |
 | [clean-monorepo-core-package-design](../.skills/clean-monorepo-core-package-design/SKILL.md) | Core package naming and sizing                       |

@@ -29,6 +29,9 @@ const {
   registerUseCaseGenerator,
 } = require("./generators/use-case.generator.ts");
 const {
+  registerDomainErrorGenerator,
+} = require("./generators/domain-error.generator.ts");
+const {
   registerSyncTsconfigReferencesAction,
 } = require("./common/tsconfig-references.utils.ts");
 
@@ -46,4 +49,5 @@ module.exports = function configurePlop(plop) {
   registerCapabilitiesGenerator(plop);
   registerPortGenerator(plop);
   registerUseCaseGenerator(plop);
+  registerDomainErrorGenerator(plop);
 };

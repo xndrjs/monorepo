@@ -13,6 +13,7 @@ describe("describeGenerator", () => {
     expect(names).toContain("capabilities");
     expect(names).toContain("infrastructure-package");
     expect(names).toContain("composition-root");
+    expect(names).toContain("domain-error");
   });
 
   it("describes core-feature prompts", async () => {

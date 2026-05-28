@@ -117,6 +117,12 @@ export default defineConfig(
           capture: ["feature"],
         },
         {
+          type: "core-errors",
+          mode: "folder",
+          pattern: "packages/core-*/errors",
+          capture: ["feature"],
+        },
+        {
           type: "core-models",
           mode: "folder",
           pattern: "packages/core-*/models",
@@ -198,6 +204,10 @@ export default defineConfig(
               allow: { to: { type: "core-types" } },
             },
             {
+              from: { type: "core-errors" },
+              allow: { to: { type: "core-errors" } },
+            },
+            {
               from: { type: "core-models" },
               allow: { to: { type: ["core-models", "core-types"] } },
             },
@@ -223,6 +233,7 @@ export default defineConfig(
                     "core-ports",
                     "core-use-cases",
                     "core-types",
+                    "core-errors",
                   ],
                 },
               },
@@ -260,6 +271,8 @@ export default defineConfig(
           "packages/core-*/models/!(*.shape(.test)?|*.test|*.primitive(.test)?|*.proof(.test)?|index).ts":
             "*.shape.ts, *.primitive.ts, *.proof.ts, colocated *.test.ts, or index.ts",
           "packages/core-*/types/!(*.types|index).ts": "*types.ts or index.ts",
+          "packages/core-*/errors/!(*.error|index).ts":
+            "*.error.ts or index.ts",
           "packages/core-*/operations/!(*.capabilities(.test)?|*.service(.test)?|index).ts":
             "*.capabilities.ts, *.service.ts, colocated *.test.ts, or index.ts",
           "packages/core-*/ports/!(*.port|index).ts": "*.port.ts or index.ts",

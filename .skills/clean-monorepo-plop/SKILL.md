@@ -10,7 +10,7 @@ description: Creates or modifies Plop generators and Handlebars templates under 
 Prefer generators over copying files by hand for:
 
 - new `@core/<feature>` packages
-- `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, `*.capabilities.ts`, `*.port.ts`, `*.use-case.ts`
+- `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, `*.capabilities.ts`, `*.port.ts`, `*.error.ts`, `*.use-case.ts`
 - `@infrastructure/<name>`, `@ui/<name>`
 - app `composition/` roots
 
@@ -53,6 +53,7 @@ plop/
 | `proof`                  | `models/<kebab>.proof.ts` + barrel; `refineType` stub (brand from proof name)                                           |
 | `capabilities`           | `operations/<kebab>.capabilities.ts` + barrel; base: shape \| primitive (`.attach` manual)                              |
 | `port`                   | `ports/<kebab>.port.ts` + empty interface                                                                               |
+| `domain-error`           | `errors/<kebab>.error.ts` + barrel; `errorCode` SCREAMING_SNAKE_CASE, `errorMessage` sentence case                      |
 | `use-case`               | `use-cases/<kebab>.use-case.ts` + **always** `*.use-case.test.ts` (vitest node)                                         |
 | `infrastructure-package` | `packages/infrastructure-<name>/`                                                                                       |
 | `ui-package`             | `packages/ui-<name>/`; optional vitest (react default)                                                                  |

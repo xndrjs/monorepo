@@ -17,6 +17,7 @@ Do not duplicate that document in chat—summarize and link when needed.
 
 | User intent / task                                                    | Skill directory                             |
 | --------------------------------------------------------------------- | ------------------------------------------- |
+| Spec map: split product into `specs/<spec-name>/` before god-specs    | `clean-monorepo-spec-map`                   |
 | Multi-layer feature (specs → domain → use case → infra → composition) | `clean-monorepo-feature-workflow`           |
 | `specs/<spec-name>/SPEC.md` + `DESIGN.md`, optional flow diagrams     | `clean-monorepo-feature-workflow` (Phase 1) |
 | New/split `@core/*` package, naming, model granularity, god package   | `clean-monorepo-core-package-design`        |

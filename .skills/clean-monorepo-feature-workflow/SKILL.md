@@ -44,6 +44,8 @@ Canonical architecture:
 
 **Before any models, ports, use cases, or infrastructure code**, capture the feature as versioned spec documents under a dedicated folder.
 
+If the product spans **multiple capabilities** and no agreed decomposition exists yet, run skill **`clean-monorepo-spec-map`** first (`specs/SPEC-MAP.md`), then return here **per** `specs/<spec-name>/`.
+
 ### Deliverable (not volatile)
 
 Phase 1 is **done** when **`SPEC.md`** and **`DESIGN.md`** exist, are agreed with the user, and are persisted in the repo. They are **not** chat-only or ephemeral drafts.
@@ -61,6 +63,7 @@ specs/<spec-name>/
 - **Location:** top-level [`specs/`](../../../specs/) at the monorepo root (sibling of `apps/`, `packages/`, `architecture/`).
 - **`<spec-name>`:** kebab-case, business-oriented (e.g. `password-vault-unlock`, `page-path-resolution`)—not necessarily identical to a `@core/*` package name.
 - **One folder per vertical slice.** Split unrelated bounded contexts into separate `specs/<spec-name>/` folders before implementation.
+- **Only `SPEC.md` and `DESIGN.md`** in each `specs/<spec-name>/` — no `README.md` or other files.
 
 Do not create `models/`, `ports/`, or other implementation layers until Phase 1 is complete. Do not defer saving specs to “later in the PR.”
 
@@ -351,6 +354,7 @@ An architecture-violating “shortcut” is **not** acceptable—re-scope from P
 
 | Phase | Skills                                                                         |
 | ----- | ------------------------------------------------------------------------------ |
+| 0     | `clean-monorepo-spec-map` (whole product → multiple `specs/<spec-name>/`)      |
 | 1     | `clean-monorepo-core-package-design`, _(this skill — `SPEC.md` + `DESIGN.md`)_ |
 | 2     | `clean-monorepo-core-models`, `clean-monorepo-plop`                            |
 | 3     | `clean-monorepo-core-capabilities`, `clean-monorepo-core-services`             |
