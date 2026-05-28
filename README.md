@@ -147,10 +147,16 @@ For non-interactive scaffolding (Cursor agents, GitHub Copilot in VS Code), use 
 
 **Enable the server**
 
-| IDE               | Config file                            |
-| ----------------- | -------------------------------------- |
-| Cursor            | [`.cursor/mcp.json`](.cursor/mcp.json) |
-| VS Code + Copilot | [`.vscode/mcp.json`](.vscode/mcp.json) |
+Canonical MCP config: [`.mcp/mcp.json`](.mcp/mcp.json) (edit only here). Tool-specific paths are symlinks; the file includes both `mcpServers` (Cursor, Claude Code) and `servers` (VS Code / Copilot):
+
+| Path                                   | Tools                      |
+| -------------------------------------- | -------------------------- |
+| [`.mcp/mcp.json`](.mcp/mcp.json)       | **Source of truth**        |
+| [`.mcp.json`](.mcp.json)               | Claude Code (project root) |
+| [`.cursor/mcp.json`](.cursor/mcp.json) | Cursor                     |
+| [`.vscode/mcp.json`](.vscode/mcp.json) | VS Code + GitHub Copilot   |
+
+VS Code also enables [`.vscode/settings.json`](.vscode/settings.json) (`chat.mcp.discovery.enabled`, `chat.mcp.autostart`) so MCP servers start when the workspace opens.
 
 Both run `pnpm mcp:plop` (stdio). Reload the window or restart MCP after changing config.
 

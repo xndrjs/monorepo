@@ -28,7 +28,7 @@ When scaffolding without a TTY (Cursor agent, CI, Copilot agent), **use the Plop
 - Check `when.requires` on conditional prompts (e.g. `primitiveScalar` only when `capabilitiesBase` is `primitive`).
 - Inspect `failures` and `validationErrors` in the run result; do not assume success from empty output.
 
-Config: [`.cursor/mcp.json`](../../../.cursor/mcp.json) (Cursor) or [`.vscode/mcp.json`](../../../.vscode/mcp.json) (VS Code + Copilot). Server entry: `pnpm mcp:plop`.
+Config: [`.mcp/mcp.json`](../../../.mcp/mcp.json) (canonical; symlinked as `.cursor/mcp.json`, `.vscode/mcp.json`, `.mcp.json`). Server entry: `pnpm mcp:plop`. Reload the IDE window after edits.
 
 Humans can still use interactive `pnpm generate`.
 
