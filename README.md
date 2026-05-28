@@ -358,9 +358,20 @@ A separate config only makes sense if a package becomes truly autonomous as an i
 
 Full rules: [architecture/clean-architecture-oriented-monorepo.md](./architecture/clean-architecture-oriented-monorepo.md).
 
-### Cursor Agent skills
+### Agent skills
 
-Task-specific guides live in `.skills/`:
+Canonical skill definitions live in [`.skills/`](./.skills/). Edit only that folder; tool-specific paths are symlinks so Cursor, GitHub Copilot, Claude Code, and Codex discover the same skills automatically:
+
+| Path                                   | Tools                                  |
+| -------------------------------------- | -------------------------------------- |
+| [`.skills/`](./.skills/)               | **Source of truth** (edit here)        |
+| [`.agents/skills/`](./.agents/skills/) | Agent Skills standard; Cursor, Copilot |
+| [`.cursor/skills/`](./.cursor/skills/) | Cursor                                 |
+| [`.github/skills/`](./.github/skills/) | GitHub Copilot (VS Code)               |
+| [`.claude/skills/`](./.claude/skills/) | Claude Code                            |
+| [`.codex/skills/`](./.codex/skills/)   | OpenAI Codex (compat)                  |
+
+Skills in `.skills/`:
 
 | Skill                                | Scope                                             |
 | ------------------------------------ | ------------------------------------------------- |

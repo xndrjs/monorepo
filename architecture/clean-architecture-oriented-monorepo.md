@@ -1,7 +1,7 @@
 # Clean Architecture Oriented Monorepo (TypeScript)
 
 > **Audience:** Human developers and coding agents (LLMs).  
-> **Purpose:** Canonical architecture for this repository. Cursor skills under `.skills/` provide task-specific operational guides; **this file is the source of truth** when they differ—prefer updating both together. Start from skill `clean-architecture-monorepo` when unsure which skill applies.  
+> **Purpose:** Canonical architecture for this repository. Agent skills under [`.skills/`](../.skills/) (symlinked from `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, `.claude/skills/`) provide task-specific operational guides; **this file is the source of truth** when they differ—prefer updating both together. Start from skill `clean-architecture-monorepo` when unsure which skill applies.  
 > **Scope:** Internal workspace packages under `apps/` and `packages/`. Not designed for publishing packages to npm.
 
 ---
