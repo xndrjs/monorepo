@@ -1,6 +1,6 @@
 ---
 name: clean-monorepo-core-models
-description: Implements or reviews *.shape.ts, *.primitive.ts, and *.proof.ts domain kits in @core packages. Proofs add guarantees on already-valid data (refineType); specs use alt UnlockedVaultProof.test(v) not a separate Note duplicating the branch. Use when creating kits or running pnpm generate shape|primitive|proof.
+description: Implements or reviews *.shape.ts, *.primitive.ts, and *.proof.ts domain kits in @core packages. Proofs add guarantees on already-valid data (refineType); DESIGN.md diagrams use Note over core XxxProof.test(…) then short alt/else labels. Use when creating kits or running pnpm generate shape|primitive|proof.
 ---
 
 # Core domain kits (`models/`)
@@ -67,18 +67,19 @@ A proof expresses an **additional domain guarantee** on data that is already str
 
 A proof may apply to a whole shape **or** a narrow refinement; scope is driven by domain language, not file count.
 
-### Proofs in `specs/` (Phase 1)
+### Proofs in `DESIGN.md` (Phase 1)
 
-When a proof **gates** a flow, the Mermaid **`alt` condition is the proof check**, for example:
+When a proof **gates** a flow, document it in `specs/<spec-name>/DESIGN.md`. If using a Mermaid diagram, put the **proof API on a `Note`**, then branch with **short** `alt` / `else` labels (Mermaid wraps long `alt` text poorly), for example:
 
 ```txt
-alt UnlockedVaultProof.test(vault)
+Note over core: UnlockedVaultProof.test(vault)
+alt vault is unlocked
   ...
 else vault is locked
   ...
 ```
 
-Do **not** add `Note over core: UnlockedVaultProof.test` and then a separate `alt vault is unlocked` for the same decision. See skill `clean-monorepo-feature-workflow` (Phase 1).
+Do **not** put only `alt UnlockedVaultProof.test(vault)` when the label is long enough to wrap awkwardly. Do **not** use a vague `alt` without the preceding note when a proof gates the branch. See skill `clean-monorepo-feature-workflow` (Phase 1).
 
 ```ts
 import { domain, zodToValidator } from "@xndrjs/domain-zod";
@@ -127,7 +128,8 @@ Scaffold capabilities after shapes/primitives exist; see skill `clean-monorepo-c
 - Deep-importing another feature’s kit file.
 - Framework or infrastructure imports in `models/`.
 - Using a proof only to duplicate what `Shape.create` / `Primitive.create` already enforces at input time.
-- Modelling a proof-gated branch in specs as `Note: XxxProof.test` plus a generic `alt` that does not name the same check.
+- Proof-gated branch in `DESIGN.md` diagrams with **only** `alt XxxProof.test(…)` (long label wraps badly)—use **Note + short `alt`** instead.
+- Proof-gated branch with a vague **`alt`** and **no** `Note over core: XxxProof.test(…)` before it.
 
 ## Tests
 
@@ -137,5 +139,5 @@ Colocate `models/<name>.test.ts` when validation, composition, or `refineType` g
 
 - Capabilities: skill `clean-monorepo-core-capabilities`.
 - Cross-model rules: skill `clean-monorepo-core-services`.
-- Multi-layer order: skill `clean-monorepo-feature-workflow` (Phase 2+; agree Phase 1 sequence diagrams first).
+- Multi-layer order: skill `clean-monorepo-feature-workflow` (Phase 2+; agree Phase 1 `SPEC.md` and `DESIGN.md` first).
 - New core package: skill `clean-monorepo-plop` (`core-feature` generator).

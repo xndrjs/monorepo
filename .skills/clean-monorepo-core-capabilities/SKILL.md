@@ -95,11 +95,11 @@ import { UserCapabilities } from "./user.capabilities.js";
 const renamed = pipe(raw, UserShape.create, UserCapabilities.rename);
 ```
 
-### Specs notation (Phase 1)
+### `DESIGN.md` notation (Phase 1)
 
-List real capability methods in notes, e.g. `Note over core: UserCapabilities.rename(user, name)`.
+List real capability methods in `DESIGN.md` (and in optional Mermaid notes), e.g. `UserCapabilities.rename(user, name)`.
 
-**Forbidden in diagrams and code:** `XxxCapabilities.validate`, `XxxCapabilities.create`, or other names that duplicate kit lifecycle. Use `XxxShape.create(input)` / `XxxPrimitive.create(value)` in notes instead.
+**Forbidden in design docs and code:** `XxxCapabilities.validate`, `XxxCapabilities.create`, or other names that duplicate kit lifecycle. Use `XxxShape.create(input)` / `XxxPrimitive.create(value)` instead.
 
 ## Rules
 

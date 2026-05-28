@@ -15,19 +15,19 @@ Do not duplicate that document in chat—summarize and link when needed.
 
 ## Which specialized skill to follow
 
-| User intent / task                                                           | Skill directory                             |
-| ---------------------------------------------------------------------------- | ------------------------------------------- |
-| Multi-layer feature (flow diagram → domain → use case → infra → composition) | `clean-monorepo-feature-workflow`           |
-| Mermaid specs in `specs/`, diagram notation                                  | `clean-monorepo-feature-workflow` (Phase 1) |
-| New/split `@core/*` package, naming, model granularity, god package          | `clean-monorepo-core-package-design`        |
-| Boundary / forbidden-import violation; ban new framework/SDK in core         | `clean-monorepo-boundaries`                 |
-| Plop generator, template `.hbs`, `plopfile.cjs`, `pnpm generate`             | `clean-monorepo-plop`                       |
-| `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, `@xndrjs/domain-zod`           | `clean-monorepo-core-models`                |
-| `*.capabilities.ts`, `forShape` / `forPrimitive`, `.attach`                  | `clean-monorepo-core-capabilities`          |
-| `*.service.ts`, cross-model pure domain functions                            | `clean-monorepo-core-services`              |
-| `apps/*/composition/`, wiring, app- vs request-scoped infra                  | `clean-monorepo-composition-root`           |
+| User intent / task                                                    | Skill directory                             |
+| --------------------------------------------------------------------- | ------------------------------------------- |
+| Multi-layer feature (specs → domain → use case → infra → composition) | `clean-monorepo-feature-workflow`           |
+| `specs/<spec-name>/SPEC.md` + `DESIGN.md`, optional flow diagrams     | `clean-monorepo-feature-workflow` (Phase 1) |
+| New/split `@core/*` package, naming, model granularity, god package   | `clean-monorepo-core-package-design`        |
+| Boundary / forbidden-import violation; ban new framework/SDK in core  | `clean-monorepo-boundaries`                 |
+| Plop generator, template `.hbs`, `plopfile.cjs`, `pnpm generate`      | `clean-monorepo-plop`                       |
+| `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, `@xndrjs/domain-zod`    | `clean-monorepo-core-models`                |
+| `*.capabilities.ts`, `forShape` / `forPrimitive`, `.attach`           | `clean-monorepo-core-capabilities`          |
+| `*.service.ts`, cross-model pure domain functions                     | `clean-monorepo-core-services`              |
+| `apps/*/composition/`, wiring, app- vs request-scoped infra           | `clean-monorepo-composition-root`           |
 
-**Read and apply** the matching `SKILL.md` under `.cursor/skills/<name>/` before implementing.
+**Read and apply** the matching `SKILL.md` under `.skills/<name>/` before implementing.
 
 ## Global invariants (always)
 

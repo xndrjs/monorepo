@@ -360,7 +360,7 @@ Full rules: [architecture/clean-architecture-oriented-monorepo.md](./architectur
 
 ### Cursor Agent skills
 
-Task-specific guides live in `.cursor/skills/`:
+Task-specific guides live in `.skills/`:
 
 | Skill                                | Scope                                             |
 | ------------------------------------ | ------------------------------------------------- |
