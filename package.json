@@ -1,5 +1,5 @@
 {
-  "name": "clean-architecture-monorepo",
+  "name": "@xndrjs/monorepo",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.22.0",

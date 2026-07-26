@@ -43,7 +43,7 @@ const mcpServer = new McpServer(
   },
   {
     instructions: [
-      "MCP tools for Plop generators in the clean-architecture-monorepo template.",
+      "MCP tools for Plop generators in the @xndrjs/monorepo workspace.",
       "Workflow: list_generators → get_generator_schema → run_generator with prompt answers.",
       "Domain kits: primitive, shape, capabilities, proof, domain-error (not core-model).",
       `Repository root: ${repoRoot}`,

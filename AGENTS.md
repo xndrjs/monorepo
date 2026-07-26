@@ -1,4 +1,4 @@
-# Agent instructions (clean-architecture-monorepo)
+# Agent instructions (@xndrjs/monorepo)
 
 ## Architecture
 
