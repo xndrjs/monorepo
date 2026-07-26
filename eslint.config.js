@@ -1,29 +1,44 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
+import markdown from "@eslint/markdown";
 import { defineConfig } from "eslint/config";
 import boundaries from "eslint-plugin-boundaries";
 import checkFile from "eslint-plugin-check-file";
 import tseslint from "typescript-eslint";
-import {
-  incompleteDocTodoMarkdownConfig,
-  incompleteDocTodoPlugin,
-} from "./eslint/incomplete-doc-todo.js";
+import cleanTemplate from "./eslint-rules/index.mjs";
 
 const repoRoot = path.dirname(fileURLToPath(import.meta.url));
+
+const scaffoldPackageSources = [
+  "packages/core-*/**/*.{ts,tsx}",
+  "packages/infrastructure-*/**/*.{ts,tsx}",
+  "packages/ui-*/**/*.{ts,tsx}",
+];
+const scaffoldPackageMarkdown = [
+  "packages/core-*/**/*.md",
+  "packages/infrastructure-*/**/*.md",
+  "packages/ui-*/**/*.md",
+];
+
+const jsTsFiles = [
+  "apps/**/*.{js,cjs,mjs,ts,tsx}",
+  "packages/**/*.{js,cjs,mjs,ts,tsx}",
+  "tools/**/*.{js,cjs,mjs,ts,tsx}",
+  "plop/**/*.{js,cjs,mjs,ts,tsx}",
+  "eslint.config.js",
+  "lint-staged.config.js",
+  "vitest.config.ts",
+];
 
 const sourceFiles = [
   "apps/**/*.{js,mjs,cjs,ts,tsx}",
   "packages/**/*.{js,mjs,cjs,ts,tsx}",
+  "tools/**/*.{js,mjs,cjs,ts,tsx}",
 ];
 const coreFiles = ["packages/core-*/**/*.{js,mjs,cjs,ts,tsx}"];
 const infrastructureFiles = [
   "packages/infrastructure-*/**/*.{js,mjs,cjs,ts,tsx}",
-];
-
-const docPlaceholderFiles = [
-  "apps/**/*.{js,mjs,cjs,ts,tsx}",
-  "packages/**/*.{js,mjs,cjs,ts,tsx}",
 ];
 
 export default defineConfig(
@@ -36,11 +51,19 @@ export default defineConfig(
       ".next/**",
       ".turbo/**",
       ".nx/**",
+      "eslint-rules/**",
     ],
   },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
   {
+    files: jsTsFiles,
+    ...js.configs.recommended,
+  },
+  ...tseslint.configs.recommended.map((config) => ({
+    ...config,
+    files: config.files ?? jsTsFiles,
+  })),
+  {
+    files: jsTsFiles,
     rules: {
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-unused-vars": [
@@ -64,24 +87,6 @@ export default defineConfig(
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
-    },
-  },
-  {
-    files: docPlaceholderFiles,
-    plugins: {
-      "incomplete-doc-todo": incompleteDocTodoPlugin,
-    },
-    rules: {
-      "incomplete-doc-todo/no-placeholder": "warn",
-    },
-  },
-  {
-    ...incompleteDocTodoMarkdownConfig,
-    plugins: {
-      "incomplete-doc-todo": incompleteDocTodoPlugin,
-    },
-    rules: {
-      "incomplete-doc-todo/no-placeholder": "warn",
     },
   },
   {
@@ -109,12 +114,6 @@ export default defineConfig(
           mode: "folder",
           pattern: "apps/*",
           capture: ["app"],
-        },
-        {
-          type: "core-types",
-          mode: "folder",
-          pattern: "packages/core-*/types",
-          capture: ["feature"],
         },
         {
           type: "core-errors",
@@ -179,6 +178,7 @@ export default defineConfig(
                     "core-operations",
                     "core-use-cases",
                     "core-ports",
+                    "core-errors",
                     "infrastructure",
                     "ui",
                   ],
@@ -194,14 +194,18 @@ export default defineConfig(
                     "app-composition",
                     "core-models",
                     "core-ports",
+                    "core-errors",
                     "ui",
                   ],
                 },
               },
             },
             {
-              from: { type: "core-types" },
-              allow: { to: { type: "core-types" } },
+              from: { type: "app" },
+              allow: {
+                to: { type: "core-use-cases" },
+                dependency: { kind: "type" },
+              },
             },
             {
               from: { type: "core-errors" },
@@ -209,18 +213,22 @@ export default defineConfig(
             },
             {
               from: { type: "core-models" },
-              allow: { to: { type: ["core-models", "core-types"] } },
+              allow: {
+                to: { type: ["core-models", "core-errors"] },
+              },
             },
             {
               from: { type: "core-operations" },
               allow: {
-                to: { type: ["core-models", "core-operations", "core-types"] },
+                to: {
+                  type: ["core-models", "core-operations", "core-errors"],
+                },
               },
             },
             {
               from: { type: "core-ports" },
               allow: {
-                to: { type: ["core-models", "core-ports", "core-types"] },
+                to: { type: ["core-models", "core-ports", "core-errors"] },
               },
             },
             {
@@ -232,7 +240,6 @@ export default defineConfig(
                     "core-operations",
                     "core-ports",
                     "core-use-cases",
-                    "core-types",
                     "core-errors",
                   ],
                 },
@@ -242,7 +249,12 @@ export default defineConfig(
               from: { type: "infrastructure" },
               allow: {
                 to: {
-                  type: ["core-models", "core-ports", "infrastructure"],
+                  type: [
+                    "core-models",
+                    "core-ports",
+                    "core-errors",
+                    "infrastructure",
+                  ],
                 },
               },
             },
@@ -260,7 +272,7 @@ export default defineConfig(
             {
               group: ["@core/*/*/**"],
               message:
-                "Import core packages through fixed entry points only: @core/<feature>/{models,operations,use-cases,ports}. Deep imports are forbidden.",
+                "Import core packages through fixed entry points only: @core/<feature>/{models,operations,use-cases,ports,errors}. Deep imports are forbidden.",
             },
           ],
         },
@@ -270,7 +282,6 @@ export default defineConfig(
         {
           "packages/core-*/models/!(*.shape(.test)?|*.test|*.primitive(.test)?|*.proof(.test)?|index).ts":
             "*.shape.ts, *.primitive.ts, *.proof.ts, colocated *.test.ts, or index.ts",
-          "packages/core-*/types/!(*.types|index).ts": "*types.ts or index.ts",
           "packages/core-*/errors/!(*.error|index).ts":
             "*.error.ts or index.ts",
           "packages/core-*/operations/!(*.capabilities(.test)?|*.service(.test)?|index).ts":
@@ -280,6 +291,26 @@ export default defineConfig(
             "*.use-case.ts or index.ts",
         },
       ],
+    },
+  },
+  {
+    files: scaffoldPackageSources,
+    plugins: {
+      "clean-template": cleanTemplate,
+    },
+    rules: {
+      "clean-template/no-todo-doc-marker": "warn",
+    },
+  },
+  {
+    files: scaffoldPackageMarkdown,
+    plugins: {
+      markdown,
+      "clean-template": cleanTemplate,
+    },
+    language: "markdown/gfm",
+    rules: {
+      "clean-template/no-todo-doc-marker": "warn",
     },
   },
   {
@@ -309,7 +340,16 @@ export default defineConfig(
   },
   {
     files: infrastructureFiles,
+    plugins: {
+      "clean-template": cleanTemplate,
+    },
     rules: {
+      "clean-template/infrastructure-prefix-boundary": [
+        "error",
+        {
+          allowedFamilies: ["datocms", "file-system", "s3"],
+        },
+      ],
       "no-restricted-imports": [
         "error",
         {

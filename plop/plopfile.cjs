@@ -14,6 +14,12 @@ const {
   registerInfrastructurePackageGenerator,
 } = require("./generators/infrastructure-package.generator.ts");
 const {
+  registerInfrastructureLoaderGenerator,
+} = require("./generators/infrastructure-loader.generator.ts");
+const {
+  registerInfrastructureRepositoryGenerator,
+} = require("./generators/infrastructure-repository.generator.ts");
+const {
   registerCapabilitiesGenerator,
 } = require("./generators/capabilities.generator.ts");
 const {
@@ -36,18 +42,29 @@ const {
 } = require("./common/tsconfig-references.utils.ts");
 
 module.exports = function configurePlop(plop) {
+  // Helpers
   registerSyncTsconfigReferencesAction(plop);
   registerZodVersionHelper(plop);
   registerXndrjsVersionHelper(plop);
+
+  // Core generators
   registerCorePackageGenerator(plop);
-  registerCompositionRootGenerator(plop);
-  registerInfrastructurePackageGenerator(plop);
-  registerUiPackageGenerator(plop);
-  registerShapeGenerator(plop);
   registerPrimitiveGenerator(plop);
-  registerProofGenerator(plop);
+  registerShapeGenerator(plop);
   registerCapabilitiesGenerator(plop);
+  registerProofGenerator(plop);
   registerPortGenerator(plop);
   registerUseCaseGenerator(plop);
   registerDomainErrorGenerator(plop);
+
+  // Infrastructure generators
+  registerInfrastructurePackageGenerator(plop);
+  registerInfrastructureLoaderGenerator(plop);
+  registerInfrastructureRepositoryGenerator(plop);
+
+  // Composition generators
+  registerCompositionRootGenerator(plop);
+
+  // UI generators
+  registerUiPackageGenerator(plop);
 };

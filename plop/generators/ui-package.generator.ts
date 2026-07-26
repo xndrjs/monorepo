@@ -1,6 +1,5 @@
 import type { NodePlopAPI } from "plop";
 import { toKebabCase } from "../common/casing.utils.ts";
-import { createPackageReadmeAction } from "../common/package-readme.utils.ts";
 import { createSyncTsconfigReferencesAction } from "../common/tsconfig-references.utils.ts";
 
 function normalizeUiPackageName(value: string): string {
@@ -74,10 +73,6 @@ export function registerUiPackageGenerator(plop: NodePlopAPI): void {
           },
           abortOnFail: true,
         },
-        createPackageReadmeAction(
-          `${destination}/README.md`,
-          `@ui/${packageName}`,
-        ),
       ];
 
       if (answers.setupVitest) {

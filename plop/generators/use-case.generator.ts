@@ -32,7 +32,7 @@ function validateUseCaseName(value: string): true | string {
 export function registerUseCaseGenerator(plop: NodePlopAPI): void {
   const corePackageChoices = getCorePackageChoices(plop);
 
-  plop.setGenerator("use-case", {
+  plop.setGenerator("core-use-case", {
     description: "Add a use case to an existing @core/<feature> package.",
     prompts: [
       {

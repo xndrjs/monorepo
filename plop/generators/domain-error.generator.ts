@@ -75,6 +75,16 @@ export function registerDomainErrorGenerator(plop: NodePlopAPI): void {
         throw new Error("Invalid error name after normalization.");
       }
 
+      // node-plop merges answers over action.data; keep normalized values on answers.
+      if (data && typeof data === "object") {
+        Object.assign(data, {
+          errorName: baseName,
+          errorCode,
+          errorMessage,
+          pascalErrorName,
+        });
+      }
+
       const errorsIndexPath = `${corePackageRel}/errors/index.ts`;
       const errorFilePath = `${corePackageRel}/errors/${kebabErrorName}.error.ts`;
       const exportLine = `export * from "./${kebabErrorName}.error";`;
@@ -90,11 +100,6 @@ export function registerDomainErrorGenerator(plop: NodePlopAPI): void {
           type: "add",
           path: errorFilePath,
           templateFile: "templates/domain-error/error.ts.hbs",
-          data: {
-            pascalErrorName,
-            errorCode,
-            errorMessage,
-          },
           abortOnFail: true,
         },
         {

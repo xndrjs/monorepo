@@ -1,0 +1,21 @@
+{
+  "name": "mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "mcp": "tsx src/mcpStdio.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/mcpStdio.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.2",
+    "node-plop": "^0.32.3",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.1",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,24 @@
+import type { {{pascalModelName}}{{#if hasModelId}}, {{pascalModelIdName}}{{/if}} } from "{{coreNpmPackageName}}/models";
+import type { {{pascalPortName}}Port } from "{{coreNpmPackageName}}/ports";
+
+import { mapRawTo{{pascalModelName}} } from "../mappers/{{kebabMapperName}}.mapper.js";
+import { {{pascalLoaderName}}Loader } from "../loaders/{{kebabLoaderName}}.loader.js";
+
+export type {{pascalRepositoryName}}RepositoryDeps = {
+  {{camelLoaderName}}Loader: {{pascalLoaderName}}Loader;
+};
+
+/**
+ * Repository "{{camelRepositoryName}}"
+ *
+ * Implements {{pascalPortName}}Port: loads raw data via {{pascalLoaderName}}Loader,
+ * maps to domain types via mappers/{{kebabMapperName}}.mapper.
+ */
+export class {{pascalRepositoryName}}Repository implements {{pascalPortName}}Port {
+  constructor(private readonly deps: {{pascalRepositoryName}}RepositoryDeps) {}
+
+  async get{{pascalModelName}}ById(id: {{#if hasModelId}}{{pascalModelIdName}}{{else}}string{{/if}}): Promise<{{pascalModelName}} | null> {
+    const raw = await this.deps.{{camelLoaderName}}Loader.get({{#if hasModelId}}String(id){{else}}id{{/if}});
+    return raw ? mapRawTo{{pascalModelName}}(raw) : null;
+  }
+}

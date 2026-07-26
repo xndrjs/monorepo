@@ -1,0 +1,7 @@
+import type { {{pascalModelName}} } from "{{coreNpmPackageName}}/models";
+import type { Raw{{pascalLoaderName}} } from "../loaders/{{kebabLoaderName}}.loader.js";
+
+export function mapRawTo{{pascalModelName}}(raw: Raw{{pascalLoaderName}}): {{pascalModelName}} {
+  // TODO: map vendor fields → domain (e.g. {{pascalModelName}}Shape.create(…))
+  throw new Error("Not implemented: mapRawTo{{pascalModelName}}");
+}

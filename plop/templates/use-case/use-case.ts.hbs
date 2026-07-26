@@ -1,23 +1,24 @@
 /**
  * Use case "{{camelUseCaseName}}"
- *
- * Application flow:
  * // TODO (doc)
- * — Why the application flow needs this use case; which problem it solves.
+ * Briefly describe the role of this use case.
  *
- * Design decisions:
- * // TODO (doc) 
- * — Non-trivial choices, trade-offs, or assumptions.
+ * Necessity / Problem solved:
+ * // TODO (doc)
+ * Explain why the application flow needs this use case.
+ * Explain which concrete workflow problem, decision, or orchestration step this use case handles.
  *
- * High level behavior:
- * // TODO (doc) 
- * — What this use case orchestrates in domain terms (no line-level detail).
+ * High-level behavior:
+ * // TODO (doc)
+ * Explain what this use case orchestrates in domain terms, without dropping to line-level detail.
  *
  * Process placement:
- * // TODO (doc) 
- * — Where this use case fits in the broader process; what typically happens before/after.
+ * // TODO (doc)
+ * Explain where this use case sits in the broader process flow, including what usually happens
+ * before and after it, if possible.
  *
- * Wire it in the app composition root with `create{{pascalUseCaseName}}UseCase(deps)`.
+ * Wire in the app composition root (e.g. `getWebServerRoot(ctx).{{camelUseCaseName}}`).
+ * Import this factory in composition root only — not from route/UI call sites.
  * Use cases should not import each other.
  */
 export interface {{pascalUseCaseName}}UseCaseDeps {

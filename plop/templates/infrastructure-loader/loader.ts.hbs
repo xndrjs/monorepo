@@ -1,0 +1,25 @@
+/**
+ * Loader "{{camelLoaderName}}"
+ *
+ * Fetches raw {{pascalLoaderName}} records from an external service (CMS, DB, HTTP API, …).
+ * Knows only the infrastructural shape — no @core/* types.
+ */
+export type Raw{{pascalLoaderName}} = {
+  // TODO: vendor-specific fields (SDK entry, DB row, API JSON, …)
+};
+
+export type {{pascalLoaderName}}LoaderDeps = {
+  // client: VendorClient;
+};
+
+export class {{pascalLoaderName}}Loader {
+  constructor(private readonly deps: {{pascalLoaderName}}LoaderDeps) {}
+
+  async get(id: string): Promise<Raw{{pascalLoaderName}} | null> {
+    throw new Error("Not implemented: {{pascalLoaderName}}Loader.get");
+  }
+
+  async getMany(ids: string[]): Promise<Raw{{pascalLoaderName}}[]> {
+    throw new Error("Not implemented: {{pascalLoaderName}}Loader.getMany");
+  }
+}
