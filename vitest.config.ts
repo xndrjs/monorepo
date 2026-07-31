@@ -12,6 +12,7 @@ export default defineConfig({
             "apps/**/*.{test,spec}.ts",
             "packages/**/*.{test,spec}.ts",
             "plop/**/*.{test,spec}.ts",
+            "eslint-rules/**/*.{test,spec}.ts",
           ],
         },
       },

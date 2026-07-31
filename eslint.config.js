@@ -347,7 +347,14 @@ export default defineConfig(
       "clean-template/infrastructure-prefix-boundary": [
         "error",
         {
-          allowedFamilies: [],
+          // Explicit directed allowlist. Each from/to pair must share a
+          // string prefix of from (e.g. from @infrastructure/http-rest-feature to
+          // ["@infrastructure/http-rest", "@infrastructure/http"]).
+          // Example:
+          // allow: [
+          //   { from: "@infrastructure/s3-somefeature", to: ["@infrastructure/s3"] },
+          // ],
+          allow: [],
         },
       ],
       "no-restricted-imports": [

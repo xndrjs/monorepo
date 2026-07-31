@@ -92,9 +92,26 @@ Aligned with `eslint.config.js` / architecture:
 
 Do **not** add path-depth bans for `@infrastructure/*` or `@ui/*` globally—each package owns its `exports`.
 
-### Infrastructure family allowlist
+### Infrastructure import allowlist
 
-`clean-template/infrastructure-prefix-boundary` uses `allowedFamilies` in `eslint.config.js`. Default template value is `[]` (no cross-family infra imports). When the workspace adds shared technology packages that may import each other (e.g. `s3`, `file-system`), extend that list with user approval.
+`clean-template/infrastructure-prefix-boundary` uses an explicit directed allowlist in `eslint.config.js`:
+
+```js
+{
+  allow: [
+    {
+      from: "@infrastructure/http-rest-feature",
+      to: ["@infrastructure/http-rest", "@infrastructure/http"], // ok — each to is a prefix of from
+    },
+    // { from: "@infrastructure/http", to: ["@infrastructure/http-rest-feature"] }, // rejected — to is not a prefix of from
+  ],
+}
+```
+
+- Default `allow: []` → no cross-package `@infrastructure/*` imports (same package always ok).
+- Package ids are full (`@infrastructure/<name>`); subpath imports resolve to the package root.
+- Every `to` **must** be a string prefix of `from` (directed); invalid entries are reported by the rule.
+- Extend the list with user approval when a context adapter may import a shared technology package.
 
 ### Severity
 
