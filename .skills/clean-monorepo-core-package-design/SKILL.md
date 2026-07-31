@@ -25,7 +25,7 @@ Avoid feature names like `common`, `shared`, `misc`, `helpers`, `utils`.
 
 Full structural rules:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md) — _Core packages_.
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md) — _Core packages_.
 
 ## New package vs extend existing
 

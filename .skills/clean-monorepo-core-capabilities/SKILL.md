@@ -27,7 +27,7 @@ Whenever logic mutates or derives values on an **already constructed** kit insta
 
 Operations layer and dependencies:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md) — _Capabilities_, _Core packages_.
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md) — _Capabilities_, _Core packages_.
 
 ## Scaffold
 

@@ -9,7 +9,7 @@ description: Implements or reviews *.shape.ts, *.primitive.ts, and *.proof.ts do
 
 Models layer rules and import bans:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md) — _Domain kits_, _Core packages_.
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md) — _Domain kits_, _Core packages_.
 
 ## Scaffold
 
@@ -111,7 +111,6 @@ export const VerifiedUserProof = domain
 - Export kits as `XxxShape`, `XxxPrimitive`, `XxxProof`—re-export via `models/index.ts` barrel.
 - Use `@xndrjs/domain-zod` (`domain`, `zodToValidator`) and Zod inline; **do not** add `XxxModel` namespaces or `DeepReadonly` wrappers for new kits.
 - Compose by importing other kits from the same feature’s `models/` (barrel or relative)—not deep paths from outside the package.
-- `types/shared.types.ts` remains for optional internal helpers only; it is not required for domain kits.
 
 ## Kit vs capabilities
 

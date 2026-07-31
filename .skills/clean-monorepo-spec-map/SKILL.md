@@ -52,7 +52,7 @@ Describe **what coherent parts exist**, not how to implement or in what order.
 
 ## What a spec is (in this repo)
 
-A **spec** is a **meaningful system capability**—a folder under top-level [`specs/`](../../../specs/) that will eventually own `SPEC.md` and `DESIGN.md`.
+A **spec** is a **meaningful system capability**—a folder under top-level [`specs/`](../../specs/) that will eventually own `SPEC.md` and `DESIGN.md`.
 
 | Good spec (capability) | Bad spec (artifact)  |
 | ---------------------- | -------------------- |

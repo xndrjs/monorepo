@@ -13,7 +13,7 @@ For a single artifact (only a shape, only ESLint), use the specialized skill ins
 
 Canonical architecture:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md)
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md)
 
 ---
 
@@ -60,7 +60,7 @@ specs/<spec-name>/
   DESIGN.md
 ```
 
-- **Location:** top-level [`specs/`](../../../specs/) at the monorepo root (sibling of `apps/`, `packages/`, `architecture/`).
+- **Location:** top-level [`specs/`](../../specs/) at the monorepo root (sibling of `apps/`, `packages/`, `architecture/`).
 - **`<spec-name>`:** kebab-case, business-oriented (e.g. `password-vault-unlock`, `page-path-resolution`)—not necessarily identical to a `@core/*` package name.
 - **One folder per vertical slice.** Split unrelated bounded contexts into separate `specs/<spec-name>/` folders before implementation.
 - **Only `SPEC.md` and `DESIGN.md`** in each `specs/<spec-name>/` — no `README.md` or other files.
@@ -316,9 +316,9 @@ Wire the feature into the app after Phases 2–5 are stable.
 
 Follow skill **`clean-monorepo-composition-root`** (mandatory).
 
-1. **New** composition module → `pnpm generate composition-root` only (never hand-roll the provider skeleton).
-2. Wire app-scoped deps on the provider; request-scoped deps via `getForContext(ctx)`.
-3. Export `getXxxRoot(ctx)` that passes infrastructure into `createXUseCase({ ...ports })` only—capabilities stay in `operations/`.
+1. Prefer **one composition file per runtime** (server / client / neutral)—extend the existing runtime file when it already exists; only `pnpm generate composition-root` for a **new** runtime module (never hand-roll).
+2. App-scoped deps at module level; request-scoped deps inside the private `get*Infrastructure(ctx)` helper.
+3. Export `getXxxRoot(ctx)` that passes infrastructure into `createXUseCase({ ...ports })` only—capabilities stay in `operations/`. Infra helpers stay private.
 4. **No new business rules** in composition—only wiring and framework setup.
 5. App/UI calls `getXxxRoot` (or thin wrappers)—not `@infrastructure/*` directly.
 

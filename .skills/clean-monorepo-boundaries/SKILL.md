@@ -19,7 +19,7 @@ See also router skill `clean-architecture-monorepo` — _Workspace tooling_.
 
 Full layer matrix, element types, and philosophy:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md) — sections _Architectural boundaries_ and _Hard bans_.
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md) — sections _Architectural boundaries_ and _Hard bans_.
 
 ## Do not edit `eslint.config.js` (default)
 
@@ -69,17 +69,19 @@ Resolver issues (alias not resolved): verify paths in `tsconfig.base.json` / `ts
 
 ### Dependency matrix
 
-| From              | May import                                        |
-| ----------------- | ------------------------------------------------- |
-| `core-models`     | `core-models`, `core-types`                       |
-| `core-operations` | `core-models`, `core-operations`, `core-types`    |
-| `core-ports`      | `core-models`, `core-ports`, `core-types`         |
-| `core-use-cases`  | all core layers + `core-types`                    |
-| `core-types`      | `core-types` only                                 |
-| `infrastructure`  | `core-models`, `core-ports`, `infrastructure`     |
-| `ui`              | `ui` only                                         |
-| `app-composition` | app, composition, all core, infrastructure, ui    |
-| `app`             | app, composition, `core-models`, `core-ports`, ui |
+Aligned with `eslint.config.js` / architecture:
+
+| From              | May import                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| `core-errors`     | `core-errors`                                                                         |
+| `core-models`     | `core-models`, `core-errors`                                                          |
+| `core-operations` | `core-models`, `core-operations`, `core-errors`                                       |
+| `core-ports`      | `core-models`, `core-ports`, `core-errors`                                            |
+| `core-use-cases`  | `core-models`, `core-operations`, `core-ports`, `core-use-cases`, `core-errors`       |
+| `infrastructure`  | `core-models`, `core-ports`, `core-errors`, `infrastructure`                          |
+| `ui`              | `ui`                                                                                  |
+| `app-composition` | app, composition, all core layers, infrastructure, ui                                 |
+| `app`             | app, composition, `core-models`, `core-ports`, `core-errors`, ui; use-cases type-only |
 
 ### Core `no-restricted-imports` (besides framework/SDK group)
 
@@ -89,6 +91,10 @@ Resolver issues (alias not resolved): verify paths in `tsconfig.base.json` / `ts
 ### Infra / UI path depth
 
 Do **not** add path-depth bans for `@infrastructure/*` or `@ui/*` globally—each package owns its `exports`.
+
+### Infrastructure family allowlist
+
+`clean-template/infrastructure-prefix-boundary` uses `allowedFamilies` in `eslint.config.js`. Default template value is `[]` (no cross-family infra imports). When the workspace adds shared technology packages that may import each other (e.g. `s3`, `file-system`), extend that list with user approval.
 
 ### Severity
 
@@ -100,11 +106,11 @@ Do **not** add path-depth bans for `@infrastructure/*` or `@ui/*` globally—eac
 | Path                          | Allowed                                                                         |
 | ----------------------------- | ------------------------------------------------------------------------------- |
 | `packages/core-*/models/`     | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, colocated `*.test.ts`, `index.ts` |
+| `packages/core-*/errors/`     | `*.error.ts`, `index.ts`                                                        |
 | `packages/core-*/operations/` | `*.capabilities.ts`, `*.service.ts`, colocated `*.test.ts`, `index.ts`          |
 | `packages/core-*/use-cases/`  | `*.use-case.ts`, `*.use-case.test.ts`, `index.ts`                               |
 | `packages/core-*/ports/`      | `*.port.ts`, `index.ts`                                                         |
-| `packages/core-*/types/`      | `*.types.ts`, `index.ts`                                                        |
 
 ## If architecture truly changes
 
-New package **kind** (not a new npm name), new layer, or new dependency matrix → update [architecture doc](../../../architecture/clean-architecture-oriented-monorepo.md) **first**, then `eslint.config.js` in a dedicated change with team agreement—not as a drive-by lint fix.
+New package **kind** (not a new npm name), new layer, or new dependency matrix → update [architecture doc](../../architecture/clean-architecture-oriented-monorepo.md) **first**, then `eslint.config.js` in a dedicated change with team agreement—not as a drive-by lint fix.

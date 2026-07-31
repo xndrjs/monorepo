@@ -15,7 +15,7 @@ description: Implements or reviews *.service.ts domain services in @core operati
 
 Architecture:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md) — _Domain services_.
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md) — _Domain services_.
 
 ## Capabilities vs services
 
@@ -35,7 +35,7 @@ import { MoneyPrimitive } from "../models/money.primitive.js";
 export function calculateLineTotal(item: LineItem, rule: TaxRule) {
   const subtotal = item.quantity * item.unitPrice;
   const tax = subtotal * rule.rate;
-  return MoneyModel.from({ amount: subtotal + tax, currency: item.currency });
+  return MoneyPrimitive.create(subtotal + tax);
 }
 ```
 
@@ -55,7 +55,7 @@ Cover happy paths, edge cases, and invalid combinations of domain inputs (withou
 
 - File name: `<kebab>.service.ts` in `operations/`.
 - Export from `operations/index.ts` (`export * from "./<kebab>.service"`).
-- May import `models/`, other `operations/` (capabilities, services), `types/`—not `ports/`, `use-cases/`, `@infrastructure/*`, or UI.
+- May import `models/`, other `operations/` (capabilities, services), `errors/`—not `ports/`, `use-cases/`, `@infrastructure/*`, or UI.
 - Keep functions deterministic; no side effects, clocks, or randomness unless injected explicitly for that case.
 
 ## Anti-patterns

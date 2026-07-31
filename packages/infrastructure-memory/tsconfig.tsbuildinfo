@@ -1,1 +1,0 @@
-{"root":["./index.ts","./loaders/index.ts","./loaders/todo.loader.ts","./mappers/index.ts","./mappers/map-raw-to-todo.mapper.test.ts","./mappers/map-raw-to-todo.mapper.ts","./repositories/index.ts","./repositories/memory-todo.repository.ts"],"version":"6.0.3"}

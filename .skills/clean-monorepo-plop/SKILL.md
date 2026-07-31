@@ -20,46 +20,52 @@ Run: `pnpm generate` or `pnpm generate <generator-name>`.
 
 When scaffolding without a TTY (Cursor agent, CI, Copilot agent), **use the Plop MCP server** — do not pipe stdin into `pnpm generate` (list prompts fail in non-TTY shells).
 
-**Tools:** `plop_list_generators` → `plop_describe_generator` → `plop_run_generator`
+**Tools:** `list_generators` → `get_generator_schema` → `run_generator`
 
 **Rules:**
 
-- Use **list prompt `value`s** from `plop_describe_generator` (e.g. `packages/core-todos`), not display labels (`@core/todos - packages/core-todos`).
-- Check `when.requires` on conditional prompts (e.g. `primitiveScalar` only when `capabilitiesBase` is `primitive`).
-- Inspect `failures` and `validationErrors` in the run result; do not assume success from empty output.
+- Use **list prompt `value`s** from `get_generator_schema` (e.g. `packages/core-todos`), not display labels (`@core/todos - packages/core-todos`).
+- Check conditional prompts (e.g. `primitiveScalar` only when base is `primitive`).
+- Inspect failures in the run result; do not assume success from empty output.
 
-Config: [`.mcp/mcp.json`](../../../.mcp/mcp.json) (canonical; symlinked as `.cursor/mcp.json`, `.vscode/mcp.json`, `.mcp.json`). Server entry: `pnpm mcp:plop`. Reload the IDE window after edits.
+Config: [`.mcp/mcp.json`](../../.mcp/mcp.json) (canonical; symlinked as `.cursor/mcp.json`, `.vscode/mcp.json`, `.mcp.json`). Server entry: `pnpm mcp:plop` (root script → `tools/mcp-server`). Reload the IDE window after edits.
 
-Humans can still use interactive `pnpm generate`.
+Humans can still use interactive `pnpm generate`. Details: [tools/mcp-server/README.md](../../tools/mcp-server/README.md).
 
 ## Layout
 
 ```txt
 plop/
   plopfile.cjs              # registers generators (tsx/cjs)
-  mcp/                      # MCP server for agent-mode scaffolding
   generators/*.generator.ts
-  templates/**                # .hbs templates
-  common/                     # casing, barrel, zod/xndrjs version utils
+  templates/**              # .hbs templates
+  common/                   # casing, barrel, zod/xndrjs version utils
+  scripts/                  # sync-tsconfig-references
+
+tools/mcp-server/           # MCP stdio server for agent-mode scaffolding
 ```
 
 ## Generators
 
-| Name                     | Output                                                                                                                  |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| `core-feature`           | `packages/core-<feature>/` + layers + `types/shared.types.ts` + `@xndrjs/domain`, `@xndrjs/domain-zod`, `zod`           |
-| `shape`                  | `models/<kebab>.shape.ts` + barrel                                                                                      |
-| `primitive`              | `models/<kebab>.primitive.ts` + barrel; scalar: string \| number \| boolean                                             |
-| `proof`                  | `models/<kebab>.proof.ts` + barrel; `refineType` stub (brand from proof name)                                           |
-| `capabilities`           | `operations/<kebab>.capabilities.ts` + barrel; base: shape \| primitive (`.attach` manual)                              |
-| `port`                   | `ports/<kebab>.port.ts` + empty interface                                                                               |
-| `domain-error`           | `errors/<kebab>.error.ts` + barrel; `errorCode` SCREAMING_SNAKE_CASE, `errorMessage` sentence case                      |
-| `use-case`               | `use-cases/<kebab>.use-case.ts` + **always** `*.use-case.test.ts` (vitest node)                                         |
-| `infrastructure-package` | `packages/infrastructure-<name>/`                                                                                       |
-| `ui-package`             | `packages/ui-<name>/`; optional vitest (react default)                                                                  |
-| `composition-root`       | `apps/<app>/composition/<app>.composition.ts` — **required** for new composition modules (provider + app/request scope) |
+| Name                        | Output                                                                                                     |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `core-feature`              | `packages/core-<feature>/` + layers (`models`, `operations`, `use-cases`, `ports`, `errors`) + xndrjs deps |
+| `shape`                     | `models/<kebab>.shape.ts` + barrel                                                                         |
+| `primitive`                 | `models/<kebab>.primitive.ts` + barrel; scalar: string \| number \| boolean                                |
+| `proof`                     | `models/<kebab>.proof.ts` + barrel; `refineType` stub (brand from proof name)                              |
+| `capabilities`              | `operations/<kebab>.capabilities.ts` + barrel; base: shape \| primitive (`.attach` manual)                 |
+| `core-port`                 | `ports/<kebab>.port.ts` + empty interface                                                                  |
+| `domain-error`              | `errors/<kebab>.error.ts` + barrel; `errorCode` SCREAMING_SNAKE_CASE, `errorMessage` sentence case         |
+| `core-use-case`             | `use-cases/<kebab>.use-case.ts` + **always** `*.use-case.test.ts` (vitest node)                            |
+| `infrastructure-package`    | `packages/infrastructure-<name>/`                                                                          |
+| `infrastructure-loader`     | loader stub in an infrastructure package                                                                   |
+| `infrastructure-repository` | repository (+ optional mapper) in an infrastructure package                                                |
+| `ui-package`                | `packages/ui-<name>/`; optional vitest (react default)                                                     |
+| `composition-root`          | `apps/<app>/composition/<app>.composition.ts` — **required** for new composition modules                   |
 
-**Suggested order for a new slice:** `core-feature` → `primitive` → `shape` → `capabilities` → `proof` → `port` / `use-case`.
+**Suggested order for a new slice:** `core-feature` → `primitive` → `shape` → `capabilities` → `proof` → `domain-error` → `core-port` / `core-use-case`.
+
+There is **no** `core-model` generator—use xndrjs kit generators (`primitive`, `shape`, `proof`) instead.
 
 ## Root `tsconfig.json` references
 
@@ -97,7 +103,7 @@ Implementation: Plop action `syncTsconfigReferences` in `plop/common/tsconfig-re
 
 Package kinds and entrypoints:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md) — _Plop generators_ and package sections.
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md) — _Plop generators_ and package sections.
 
 Domain-specific patterns (shapes, primitives, proofs, capabilities) live in their dedicated skills—not here.
 

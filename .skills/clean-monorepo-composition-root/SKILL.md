@@ -5,13 +5,21 @@ description: Creates or extends app composition roots under apps/*/composition/ 
 
 # Composition root (`apps/*/composition/`)
 
-## One composition module per feature
+## One composition module per runtime
 
-**Encouraged:** one `*.composition.ts` per bounded context / `@core/<feature>` (e.g. `billing.composition.ts`, `catalog.composition.ts`).
+**Encouraged:** one `*.composition.ts` per **runtime boundary** for the app—not one file per `@core/<feature>`.
 
-- Keeps each provider focused on the ports that feature’s use cases need.
-- Avoids a single god composition root that wires every adapter and use case in the app.
-- Multiple files under `composition/` are normal; each is created with `pnpm generate composition-root`.
+| Runtime | Typical file                  | Public export (example) |
+| ------- | ----------------------------- | ----------------------- |
+| Server  | `<app>-server.composition.ts` | `get<App>ServerRoot`    |
+| Client  | `<app>-client.composition.ts` | `get<App>ClientRoot`    |
+| Neutral | `<app>.composition.ts`        | `get<App>Root`          |
+
+- Wire **all** features’ use cases for that runtime in the same root.
+- Do **not** split into `billing-server.composition.ts`, `catalog-server.composition.ts`, etc.
+- Server-only and client-only are mutually exclusive in the generator.
+
+Architecture risk table bans per-feature composition files (fragmentation) and god roots that mix runtimes without guards.
 
 ## Mandatory scaffold
 
@@ -21,11 +29,11 @@ description: Creates or extends app composition roots under apps/*/composition/ 
 pnpm generate composition-root
 ```
 
-Prompts: target app, file name (default `<app>.composition.ts`—prefer `<feature>.composition.ts`).
+Prompts: target app, server-only / client-only, file name (defaults follow the table above).
 
-The template enforces the **infrastructure provider** pattern and the split between **app-scoped** and **request-scoped** dependencies. Hand-written roots tend to skip `getForContext(ctx)` and mix lifetimes incorrectly.
+The template enforces private infrastructure helpers and the split between **app-scoped** and **request-scoped** dependencies. Hand-written roots tend to export infra factories or mix lifetimes incorrectly.
 
-Extending an **existing** generator-created file is fine; adding a **new** composition module without `pnpm generate composition-root` is not.
+Extending an **existing** generator-created file is fine; adding a **new** composition module without `pnpm generate composition-root` is not. If the target file already exists, generation fails—add wiring to the existing runtime file instead.
 
 ## Role
 
@@ -43,83 +51,81 @@ Composition is the **only** place where:
 
 Architecture:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md) — _Composition root_.
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md) — _Composition root_.
 
 ## Generated structure
 
 ```ts
-type RequestContext = /* customize: correlationId, tenantId, userId, ... */;
+// TODO: customize the request context, e.g. correlationId
+type RequestContext = never;
 
-class BillingCompositionInfrastructureProvider {
-  // App-scoped: fields or lazy getters on the provider instance
-  private readonly paymentGateway = new StripePaymentAdapter(/* ... */);
+// App-scoped dependencies — module level (SDK clients, config, pools).
+// const cmsClient = createCmsClient({ ... });
 
-  // Request-scoped: methods that take RequestContext
-  getAuditLogger(ctx: RequestContext) {
-    return new RequestAuditLogger(ctx.correlationId);
-  }
-
-  getForContext(ctx: RequestContext) {
-    return {
-      paymentGateway: this.paymentGateway,
-      auditLogger: this.getAuditLogger(ctx),
-    };
-  }
+function getInfrastructure(ctx: RequestContext) {
+  return {
+    // cms: new CmsAdapter(cmsClient, ctx),
+  };
 }
 
-const infrastructureProvider = new BillingCompositionInfrastructureProvider();
-
-export function getBillingRoot(ctx: RequestContext) {
-  const infrastructure = infrastructureProvider.getForContext(ctx);
+/**
+ * Returns use cases wired for one request context.
+ */
+export function getWebRoot(ctx: RequestContext) {
+  const infra = getInfrastructure(ctx);
 
   return {
-    createInvoice: createCreateInvoiceUseCase({
-      paymentGateway: infrastructure.paymentGateway,
-      auditLogger: infrastructure.auditLogger,
-    }),
+    // getInvoice: createGetInvoiceUseCase(infra),
   };
 }
 ```
 
-Use cases pull domain operations from `@core/billing/operations` (e.g. `userCapabilities`)—never from composition.
+Server-only modules use `getServerInfrastructure` / `getXxxServerRoot`; client-only use `getClientInfrastructure` / `getXxxClientRoot`. Infrastructure helpers stay **module-private**—export only `get*Root`.
+
+Use cases pull domain operations from `@core/<feature>/operations`—never from composition.
 
 ## App-scoped vs request-scoped
 
-| Lifetime           | Where                                | Examples                                                                      |
-| ------------------ | ------------------------------------ | ----------------------------------------------------------------------------- |
-| **App-scoped**     | Provider fields or lazy getters      | SDK clients, connection pools, config loaded once, stateless adapters         |
-| **Request-scoped** | Methods `(ctx: RequestContext) => …` | Per-request DB session, logger with correlation id, tenant-bound repositories |
+| Lifetime           | Where                                         | Examples                                                               |
+| ------------------ | --------------------------------------------- | ---------------------------------------------------------------------- |
+| **App-scoped**     | Module-level `const` outside the infra helper | SDK clients, connection pools, config loaded once, stateless adapters  |
+| **Request-scoped** | Built inside `get*Infrastructure(ctx)`        | Per-request DB session, logger with correlation id, tenant-bound repos |
 
 **Rules:**
 
 - App-scoped deps MUST NOT capture `RequestContext` in closures created at module load.
-- Request-scoped deps MUST be created inside `getForContext(ctx)` (or helpers it calls)—never cached on the provider without keyed-by-request semantics.
-- `getXxxRoot(ctx)` MUST call `infrastructureProvider.getForContext(ctx)` and pass the result into use-case factories only.
+- Request-scoped deps MUST be created inside the private infra helper (or helpers it calls)—never cached at module scope without keyed-by-request semantics.
+- `getXxxRoot(ctx)` MUST call the private infra helper and pass the result into use-case factories only.
 
 Customize `RequestContext` at the top of the file to match the app (Next request, CLI args, job metadata, etc.).
 
+On server-only modules, prefer `React.cache` only for shared per-request state (e.g. DataLoader registry), then build adapters inside the private infra helper.
+
 ## Wiring checklist
 
-- [ ] One composition file per feature (or clear submodule), not one mega-root for the whole app.
+- [ ] One composition file per **runtime** (server / client / neutral)—not per `@core` feature.
 - [ ] File created via `pnpm generate composition-root`.
-- [ ] Each port used by that feature’s use cases has an adapter in `getForContext` (or app-scoped field reused there).
+- [ ] Each port used by wired use cases has an adapter in the private infra helper (or app-scoped field reused there).
 - [ ] Use cases imported from `@core/<feature>/use-cases` only—no deep paths.
 - [ ] Capabilities attached in `operations/`; composition does **not** wire `.attach` or domain behavior.
 - [ ] Rest of the app imports `getXxxRoot` (or thin wrappers)—not `@infrastructure/*` directly.
+- [ ] Infra helpers are **not** exported.
 
 ## Anti-patterns
 
-- Single composition root wiring every feature’s use cases and adapters (god composition).
-- `createUserCapabilities(UserModel.from)` (or similar) in composition—belongs in `operations/`.
-- New composition file copied from another app without running the generator (missing provider skeleton).
-- Instantiating infrastructure inside route handlers instead of through `getForContext`.
-- Storing `RequestContext` on a singleton provider field.
+- One `*.composition.ts` per `@core/<feature>` (fragmentation).
+- Mixing server and client wiring in one file without `server-only` / `client-only` guards.
+- `createUserCapabilities(…).attach(…)` (or similar) in composition—belongs in `operations/`.
+- New composition file copied from another app without running the generator.
+- Instantiating infrastructure inside route handlers instead of through `get*Root`.
+- Exporting `get*Infrastructure` for app call sites.
 - Domain validation or pricing rules in composition.
 - Importing `@core/*` from infrastructure packages (inverse dependency).
 
 ## Related
 
 - Domain capabilities wiring: skill `clean-monorepo-core-capabilities`.
+- Ports: skill `clean-monorepo-core-ports`.
 - Multi-layer order: skill `clean-monorepo-feature-workflow` (Phase 6).
 - Scaffold: skill `clean-monorepo-plop`.
 - Boundaries: skill `clean-monorepo-boundaries`.

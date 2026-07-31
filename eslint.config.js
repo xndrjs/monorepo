@@ -347,7 +347,7 @@ export default defineConfig(
       "clean-template/infrastructure-prefix-boundary": [
         "error",
         {
-          allowedFamilies: ["datocms", "file-system", "s3"],
+          allowedFamilies: [],
         },
       ],
       "no-restricted-imports": [

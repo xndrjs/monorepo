@@ -9,7 +9,7 @@ description: Routes ambiguous work in the clean-template TypeScript monorepo to 
 
 For the complete contract (layers, imports, boundaries matrix, risks), read:
 
-[architecture/clean-architecture-oriented-monorepo.md](../../../architecture/clean-architecture-oriented-monorepo.md)
+[architecture/clean-architecture-oriented-monorepo.md](../../architecture/clean-architecture-oriented-monorepo.md)
 
 Do not duplicate that document in chat—summarize and link when needed.
 
@@ -26,6 +26,7 @@ Do not duplicate that document in chat—summarize and link when needed.
 | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, `@xndrjs/domain-zod`    | `clean-monorepo-core-models`                |
 | `*.capabilities.ts`, `forShape` / `forPrimitive`, `.attach`           | `clean-monorepo-core-capabilities`          |
 | `*.service.ts`, cross-model pure domain functions                     | `clean-monorepo-core-services`              |
+| `*.port.ts`, role-oriented outbound contracts (no vendors in core)    | `clean-monorepo-core-ports`                 |
 | `apps/*/composition/`, wiring, app- vs request-scoped infra           | `clean-monorepo-composition-root`           |
 
 **Read and apply** the matching `SKILL.md` under `.skills/<name>/` before implementing.

@@ -24,8 +24,10 @@ Cursor and Claude spawn the server from `.mcp.json` when MCP is enabled.
 Start manually (repo root):
 
 ```bash
-pnpm --prefix tools/mcp-server mcp
+pnpm mcp:plop
 ```
+
+Equivalent: `pnpm --prefix tools/mcp-server mcp`.
 
 ## Setup
 

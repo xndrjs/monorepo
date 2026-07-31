@@ -5,6 +5,7 @@
   "packageManager": "pnpm@10.22.0",
   "scripts": {
     "generate": "plop --plopfile plop/plopfile.cjs --dest .",
+    "mcp:plop": "pnpm --prefix tools/mcp-server mcp",
     "sync-tsconfig-references": "tsx plop/scripts/sync-tsconfig-references.ts",
     "postinstall": "pnpm sync-tsconfig-references",
     "prepare": "husky",

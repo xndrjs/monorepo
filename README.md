@@ -331,7 +331,7 @@ Full rules: [architecture/clean-architecture-oriented-monorepo.md](./architectur
 
 Task-specific guides live in [`.skills/`](./.skills/) (canonical). Symlinks expose the same tree to Cursor (`.cursor/skills`), GitHub Copilot (`.github/skills`), and Claude Code (`.claude/skills`).
 
-**Agents:** `.cursor/skills` and `.claude/skills` are the **same files** as `.skills/` — edit only `.skills/<name>/SKILL.md`. Do not add “see canonical guide” stubs; see [AGENTS.md](./AGENTS.md) and `.cursor/rules/skills-symlinks.mdc`.
+**Agents:** `.cursor/skills` and `.claude/skills` are the **same files** as `.skills/` — edit only `.skills/<name>/SKILL.md`. Do not add “see canonical guide” stubs; see [AGENTS.md](./AGENTS.md).
 
 **Plop MCP:** [`.mcp.json`](./.mcp.json) registers `clean-monorepo-plop` for Cursor and Claude (`.cursor/mcp.json` is a symlink). See [tools/mcp-server/README.md](./tools/mcp-server/README.md).
 
