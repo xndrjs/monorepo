@@ -13,3 +13,5 @@ export const {{pascalName}}Proof = domain
   .refineType((row): row is typeof row & { /* TODO */ } => {
     return true;
   });
+
+export type {{pascalName}} = ReturnType<(typeof {{pascalName}}Proof)["assert"]>;
