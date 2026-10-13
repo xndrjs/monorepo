@@ -47,21 +47,22 @@ tools/mcp-server/           # MCP stdio server for agent-mode scaffolding
 
 ## Generators
 
-| Name                        | Output                                                                                                     |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `core-feature`              | `packages/core-<feature>/` + layers (`models`, `operations`, `use-cases`, `ports`, `errors`) + xndrjs deps |
-| `shape`                     | `models/<kebab>.shape.ts` + barrel                                                                         |
-| `primitive`                 | `models/<kebab>.primitive.ts` + barrel; scalar: string \| number \| boolean                                |
-| `proof`                     | `models/<kebab>.proof.ts` + barrel; `refineType` stub (brand from proof name)                              |
-| `capabilities`              | `operations/<kebab>.capabilities.ts` + barrel; base: shape \| primitive (`.attach` manual)                 |
-| `core-port`                 | `ports/<kebab>.port.ts` + empty interface                                                                  |
-| `domain-error`              | `errors/<kebab>.error.ts` + barrel; `errorCode` SCREAMING_SNAKE_CASE, `errorMessage` sentence case         |
-| `core-use-case`             | `use-cases/<kebab>.use-case.ts` + **always** `*.use-case.test.ts` (vitest node)                            |
-| `infrastructure-package`    | `packages/infrastructure-<name>/`                                                                          |
-| `infrastructure-loader`     | loader stub in an infrastructure package                                                                   |
-| `infrastructure-repository` | repository (+ optional mapper) in an infrastructure package                                                |
-| `ui-package`                | `packages/ui-<name>/`; optional vitest (react default)                                                     |
-| `composition-root`          | `apps/<app>/composition/<app>.composition.ts` — **required** for new composition modules                   |
+| Name           | Output                                                                                                      |
+| -------------- | ----------------------------------------------------------------------------------------------------------- |
+| `core-feature` | `packages/core-<feature>/` + layers (`models`, `operations`, `use-cases`, `ports`, `errors`) + xndrjs deps  |
+| `shape`        | `models/<kebab>.shape.ts` + barrel                                                                          |
+| `primitive`    | `models/<kebab>.primitive.ts` + barrel; scalar: string \| number \| boolean                                 |
+| `proof`        | `models/<kebab>.proof.ts` + barrel; `refineType` stub (brand from proof name)                               |
+| `capabilities` | `operations/<kebab>.capabilities.ts` + barrel; base: shape \| primitive (`forShapeKit` / `forPrimitiveKit`) |
+
+| `core-port` | `ports/<kebab>.port.ts` + empty interface |
+| `domain-error` | `errors/<kebab>.error.ts` + barrel; `errorCode` SCREAMING_SNAKE_CASE, `errorMessage` sentence case |
+| `core-use-case` | `use-cases/<kebab>.use-case.ts` + **always** `*.use-case.test.ts` (vitest node) |
+| `infrastructure-package` | `packages/infrastructure-<name>/` |
+| `infrastructure-loader` | loader stub in an infrastructure package |
+| `infrastructure-repository` | repository (+ optional mapper) in an infrastructure package |
+| `ui-package` | `packages/ui-<name>/`; optional vitest (react default) |
+| `composition-root` | `apps/<app>/composition/<app>.composition.ts` — **required** for new composition modules |
 
 **Suggested order for a new slice:** `core-feature` → `primitive` → `shape` → `capabilities` → `proof` → `domain-error` → `core-port` / `core-use-case`.
 

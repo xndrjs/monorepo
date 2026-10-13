@@ -1,7 +1,9 @@
-import { domain, zodToValidator } from "@xndrjs/domain-zod";
+import { domain } from "@xndrjs/domain-zod";
 import { z } from "zod";
 
 export const {{pascalName}}Primitive = domain.primitive(
   "{{pascalName}}",
-  zodToValidator(z.boolean()),
+  z.boolean(),
 );
+
+export type {{pascalName}} = ReturnType<(typeof {{pascalName}}Primitive)["create"]>;

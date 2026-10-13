@@ -253,7 +253,7 @@ Work **before** use cases and infrastructure.
 ### Single-kit behavior → `*.capabilities.ts`
 
 - `pnpm generate capabilities` after the shape or primitive kit exists; add `.attach` manually.
-- Export `XxxCapabilities`; use `forShape` / `forPrimitive` (skill `clean-monorepo-core-capabilities`).
+- Export `XxxCapabilities`; prefer `forShapeKit` / `forPrimitiveKit` (skill `clean-monorepo-core-capabilities`).
 - Colocated `*.capabilities.test.ts` for non-trivial rules.
 
 ### Cross-model pure logic → `*.service.ts`

@@ -4,7 +4,6 @@ import { toKebabCase, toPascalCase } from "../common/casing.utils.ts";
 import { getCorePackageChoices } from "../common/workspace.utils.ts";
 
 type CapabilitiesBase = "shape" | "primitive";
-type PrimitiveScalar = "string" | "number" | "boolean";
 
 const CAPABILITIES_BASE_TEMPLATE: Record<CapabilitiesBase, string> = {
   shape: "templates/capabilities/capabilities.shape.ts.hbs",
@@ -41,14 +40,6 @@ function normalizeCapabilitiesBase(value: unknown): CapabilitiesBase {
   return "shape";
 }
 
-function normalizePrimitiveScalar(value: unknown): PrimitiveScalar {
-  if (value === "number" || value === "boolean") {
-    return value;
-  }
-
-  return "string";
-}
-
 export function registerCapabilitiesGenerator(plop: NodePlopAPI): void {
   const corePackageChoices = getCorePackageChoices(plop);
 
@@ -79,19 +70,6 @@ export function registerCapabilitiesGenerator(plop: NodePlopAPI): void {
         ],
         default: "shape",
       },
-      {
-        type: "list",
-        name: "primitiveScalar",
-        message: "Primitive scalar (for forPrimitive<...>):",
-        choices: [
-          { name: "string", value: "string" },
-          { name: "number", value: "number" },
-          { name: "boolean", value: "boolean" },
-        ],
-        default: "string",
-        when: (answers: { capabilitiesBase?: string }) =>
-          answers.capabilitiesBase === "primitive",
-      },
     ],
     actions: (data) => {
       const corePackageRel = String(data?.corePackageRel ?? "");
@@ -103,7 +81,6 @@ export function registerCapabilitiesGenerator(plop: NodePlopAPI): void {
       const capabilitiesBase = normalizeCapabilitiesBase(
         data?.capabilitiesBase,
       );
-      const primitiveScalar = normalizePrimitiveScalar(data?.primitiveScalar);
 
       if (!corePackageRel) {
         throw new Error("No core package selected.");
@@ -130,7 +107,7 @@ export function registerCapabilitiesGenerator(plop: NodePlopAPI): void {
           templateFile: CAPABILITIES_BASE_TEMPLATE[capabilitiesBase],
           data: {
             pascalCapabilitiesName,
-            primitiveScalar,
+            kebabCapabilitiesName,
           },
           abortOnFail: true,
         },

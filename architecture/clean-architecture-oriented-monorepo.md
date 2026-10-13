@@ -133,7 +133,7 @@ await getInvoice({ invoiceId });
 
 All features’ use cases for that runtime are wired in the same root. Do **not** split into `billing-server.composition.ts`, etc.
 
-**Domain vs composition:** Attach capability kits to shapes/primitives in `operations/` (`.attach` on the capability kit); composition imports `createXUseCase` from `@core/*/use-cases` and wires them in `get*Root`—capabilities stay in `operations/`.
+**Domain vs composition:** Bind capability kits to shapes/primitives in `operations/` (`forShapeKit` / `forPrimitiveKit`, or Contract + `.attach`); composition imports `createXUseCase` from `@core/*/use-cases` and wires them in `get*Root`—capabilities stay in `operations/`.
 
 **Request-scoped dedup (RSC):** On server-only modules, prefer `React.cache` only for shared per-request state (e.g. DataLoader registry), then build adapters inside the private infra helper.
 
@@ -230,13 +230,13 @@ ESLint enforces deep-import bans on `@core/*` via `no-restricted-imports`. Layer
 
 ### Domain kits (`models/`)
 
-Domain types are **xndrjs domain kits** scaffolded with Plop (`shape`, `primitive`, `proof`). Use `@xndrjs/domain-zod` (`domain`, `zodToValidator`) and Zod inline in each file—**not** `XxxModel` namespaces, `createModelKit`, or `DeepReadonly`.
+Domain types are **xndrjs domain kits** scaffolded with Plop (`shape`, `primitive`, `proof`). Use `@xndrjs/domain-zod` with **native Zod schemas** on `domain.shape` / `primitive` / `proof` (or `domain.core.*` + `zodToValidator` for Validator path)—**not** `XxxModel` namespaces, `createModelKit`, or `DeepReadonly`.
 
-| File suffix      | Export              | API (scaffold)                                          |
-| ---------------- | ------------------- | ------------------------------------------------------- |
-| `*.shape.ts`     | `UserShape`         | `domain.shape("User", zodToValidator(z.object({…})))`   |
-| `*.primitive.ts` | `EmailPrimitive`    | `domain.primitive("Email", zodToValidator(z.string()))` |
-| `*.proof.ts`     | `VerifiedUserProof` | `domain.proof(…).refineType(…)`                         |
+| File suffix      | Export              | API (scaffold)                          |
+| ---------------- | ------------------- | --------------------------------------- |
+| `*.shape.ts`     | `UserShape`         | `domain.shape("User", z.object({…}))`   |
+| `*.primitive.ts` | `EmailPrimitive`    | `domain.primitive("Email", z.string())` |
+| `*.proof.ts`     | `VerifiedUserProof` | `domain.proof(…).refineType(…)`         |
 
 **Rules:**
 
@@ -253,10 +253,11 @@ Domain **custom** operations on shapes or primitives in `operations/` (beyond ki
 
 - Export: **`XxxCapabilities`** (e.g. `UserCapabilities`), not a bare name.
 - **Do not** implement `validate`, `create`, or equivalent lifecycle methods on capabilities—use `XxxShape.create` / `XxxPrimitive.create` in `models/`.
-- **Shape base:** `domain.capabilities.forShape<Contract>().methods(…)`; add `.attach(UserShape)` manually after generate.
-- **Primitive base:** `domain.capabilities.forPrimitive<string|number|boolean>().methods(…)`; add `.attach(EmailPrimitive)` manually after generate.
+- **Shape (preferred):** `domain.capabilities.forShapeKit(UserShape).methods(…)` — already bound, no `.attach`.
+- **Primitive (preferred):** `domain.capabilities.forPrimitiveKit(EmailPrimitive).methods(…)`.
+- **Contract path** (shared / delayed attach): `forShapeContract<Contract>()` / `forPrimitiveContract<Scalar>()` then `.attach(kit)`.
 
-Typical usage after attach:
+Typical usage:
 
 ```ts
 const user = UserShape.create(raw);
@@ -471,7 +472,7 @@ Run: `pnpm generate` or `pnpm generate <name>`.
 | `primitive`                 | `models/<name>.primitive.ts` + barrel; base scalar: string \| number \| boolean                                          |
 | `shape`                     | `models/<name>.shape.ts` + barrel export                                                                                 |
 | `proof`                     | `models/<name>.proof.ts` + barrel; `refineType` stub (brand from proof name)                                             |
-| `capabilities`              | `operations/<name>.capabilities.ts` + barrel; base: shape \| primitive (`.attach` manual)                                |
+| `capabilities`              | `operations/<name>.capabilities.ts` + barrel; base: shape \| primitive (`forShapeKit` / `forPrimitiveKit`)               |
 | `domain-error`              | `errors/<name>.error.ts` + barrel; `errorCode` SCREAMING_SNAKE_CASE, `errorMessage` sentence case                        |
 | `core-port`                 | `ports/<name>.port.ts` + empty interface                                                                                 |
 | `core-use-case`             | `use-cases/<name>.use-case.ts` + **always** `*.use-case.test.ts` (Vitest `node`)                                         |
@@ -604,16 +605,16 @@ The hard part is not folder names—it is **preventing accidental cross-layer im
 
 ### Agent skills (task-specific; load via @ or narrow intent)
 
-| Skill                                                                                        | Use for                                              |
-| -------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [clean-architecture-monorepo](../.skills/clean-architecture-monorepo/SKILL.md)               | Router when context is ambiguous                     |
-| [clean-monorepo-spec-map](../.skills/clean-monorepo-spec-map/SKILL.md)                       | Multi-capability / god-spec decomposition            |
-| [clean-monorepo-feature-workflow](../.skills/clean-monorepo-feature-workflow/SKILL.md)       | Multi-layer feature implementation order             |
-| [clean-monorepo-composition-root](../.skills/clean-monorepo-composition-root/SKILL.md)       | App composition, app- vs request-scoped wiring       |
-| [clean-monorepo-core-package-design](../.skills/clean-monorepo-core-package-design/SKILL.md) | Core package naming and sizing                       |
-| [clean-monorepo-boundaries](../.skills/clean-monorepo-boundaries/SKILL.md)                   | ESLint boundaries and imports                        |
-| [clean-monorepo-plop](../.skills/clean-monorepo-plop/SKILL.md)                               | Plop generators and templates                        |
-| [clean-monorepo-core-models](../.skills/clean-monorepo-core-models/SKILL.md)                 | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`         |
-| [clean-monorepo-core-capabilities](../.skills/clean-monorepo-core-capabilities/SKILL.md)     | `*.capabilities.ts` (`forShape` / `forPrimitive`)    |
-| [clean-monorepo-core-services](../.skills/clean-monorepo-core-services/SKILL.md)             | `*.service.ts` cross-model domain logic              |
-| [clean-monorepo-core-ports](../.skills/clean-monorepo-core-ports/SKILL.md)                   | `*.port.ts` role-oriented ports (no vendors in core) |
+| Skill                                                                                        | Use for                                                 |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [clean-architecture-monorepo](../.skills/clean-architecture-monorepo/SKILL.md)               | Router when context is ambiguous                        |
+| [clean-monorepo-spec-map](../.skills/clean-monorepo-spec-map/SKILL.md)                       | Multi-capability / god-spec decomposition               |
+| [clean-monorepo-feature-workflow](../.skills/clean-monorepo-feature-workflow/SKILL.md)       | Multi-layer feature implementation order                |
+| [clean-monorepo-composition-root](../.skills/clean-monorepo-composition-root/SKILL.md)       | App composition, app- vs request-scoped wiring          |
+| [clean-monorepo-core-package-design](../.skills/clean-monorepo-core-package-design/SKILL.md) | Core package naming and sizing                          |
+| [clean-monorepo-boundaries](../.skills/clean-monorepo-boundaries/SKILL.md)                   | ESLint boundaries and imports                           |
+| [clean-monorepo-plop](../.skills/clean-monorepo-plop/SKILL.md)                               | Plop generators and templates                           |
+| [clean-monorepo-core-models](../.skills/clean-monorepo-core-models/SKILL.md)                 | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`            |
+| [clean-monorepo-core-capabilities](../.skills/clean-monorepo-core-capabilities/SKILL.md)     | `*.capabilities.ts` (`forShapeKit` / `forPrimitiveKit`) |
+| [clean-monorepo-core-services](../.skills/clean-monorepo-core-services/SKILL.md)             | `*.service.ts` cross-model domain logic                 |
+| [clean-monorepo-core-ports](../.skills/clean-monorepo-core-ports/SKILL.md)                   | `*.port.ts` role-oriented ports (no vendors in core)    |

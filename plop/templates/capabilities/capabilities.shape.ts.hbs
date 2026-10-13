@@ -1,9 +1,8 @@
 import { domain } from "@xndrjs/domain-zod";
+import { {{pascalCapabilitiesName}}Shape } from "../models/{{kebabCapabilitiesName}}.shape";
 
 export const {{pascalCapabilitiesName}}Capabilities = domain.capabilities
-  .forShape<{
-    // TODO: align contract with shape fields
-  }>()
+  .forShapeKit({{pascalCapabilitiesName}}Shape)
   .methods(({ patch }) => ({
     // TODO: add capabilities
   }));

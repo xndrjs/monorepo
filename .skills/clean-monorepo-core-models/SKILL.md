@@ -27,30 +27,34 @@ pnpm generate proof       # refined type, e.g. verified-user
 
 ## Shape (`*.shape.ts`)
 
+With `@xndrjs/domain-zod`, top-level `domain.shape` / `primitive` / `proof` take a **Zod schema** directly. Use `domain.core.*` + `zodToValidator` only for Validator-path kits.
+
 ```ts
-import { domain, zodToValidator } from "@xndrjs/domain-zod";
+import { domain } from "@xndrjs/domain-zod";
 import { z } from "zod";
 
 export const UserShape = domain.shape(
   "User",
-  zodToValidator(
-    z.object({
-      email: z.string(), // TODO: compose EmailPrimitive or inline Zod
-    }),
-  ),
+  z.object({
+    email: z.string(), // TODO: compose EmailPrimitive via zodFromKit or inline Zod
+  }),
 );
+
+export type User = ReturnType<(typeof UserShape)["create"]>;
 ```
 
 ## Primitive (`*.primitive.ts`)
 
 ```ts
-import { domain, zodToValidator } from "@xndrjs/domain-zod";
+import { domain } from "@xndrjs/domain-zod";
 import { z } from "zod";
 
 export const EmailPrimitive = domain.primitive(
   "Email",
-  zodToValidator(z.string()), // or z.number() / z.boolean()
+  z.string(), // or z.number() / z.boolean()
 );
+
+export type Email = ReturnType<(typeof EmailPrimitive)["create"]>;
 ```
 
 ## Proof (`*.proof.ts`)
@@ -82,17 +86,15 @@ else vault is locked
 Do **not** put only `alt UnlockedVaultProof.test(vault)` when the label is long enough to wrap awkwardly. Do **not** use a vague `alt` without the preceding note when a proof gates the branch. See skill `clean-monorepo-feature-workflow` (Phase 1).
 
 ```ts
-import { domain, zodToValidator } from "@xndrjs/domain-zod";
+import { domain } from "@xndrjs/domain-zod";
 import { z } from "zod";
 
 export const VerifiedUserProof = domain
   .proof(
     "VerifiedUser",
-    zodToValidator(
-      z.object({
-        // TODO: baseline schema
-      }),
-    ),
+    z.object({
+      // TODO: baseline schema
+    }),
   )
   .refineType(
     (
@@ -104,12 +106,14 @@ export const VerifiedUserProof = domain
       throw new Error("Not implemented");
     },
   );
+
+export type VerifiedUser = ReturnType<(typeof VerifiedUserProof)["assert"]>;
 ```
 
 ## Rules
 
 - Export kits as `XxxShape`, `XxxPrimitive`, `XxxProof`—re-export via `models/index.ts` barrel.
-- Use `@xndrjs/domain-zod` (`domain`, `zodToValidator`) and Zod inline; **do not** add `XxxModel` namespaces or `DeepReadonly` wrappers for new kits.
+- Prefer adapter-native Zod schemas on `domain.shape` / `primitive` / `proof`; use `zodFromKit` to nest kits; use `domain.core.*` + `zodToValidator` only when you need a `Validator`. **Do not** add `XxxModel` namespaces or `DeepReadonly` wrappers for new kits.
 - Compose by importing other kits from the same feature’s `models/` (barrel or relative)—not deep paths from outside the package.
 
 ## Kit vs capabilities

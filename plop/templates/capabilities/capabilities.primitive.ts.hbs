@@ -1,7 +1,8 @@
 import { domain } from "@xndrjs/domain-zod";
+import { {{pascalCapabilitiesName}}Primitive } from "../models/{{kebabCapabilitiesName}}.primitive";
 
 export const {{pascalCapabilitiesName}}Capabilities = domain.capabilities
-  .forPrimitive<{{primitiveScalar}}>()
+  .forPrimitiveKit({{pascalCapabilitiesName}}Primitive)
   .methods(({ create }) => ({
     // TODO: add capabilities
   }));

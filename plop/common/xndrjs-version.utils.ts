@@ -2,8 +2,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type { NodePlopAPI } from "plop";
 
-export const DEFAULT_XNDRJS_DOMAIN_VERSION = "^0.3.0";
-export const DEFAULT_XNDRJS_DOMAIN_ZOD_VERSION = "^0.3.0";
+export const DEFAULT_XNDRJS_DOMAIN_VERSION = "0.4.0-alpha.1";
+export const DEFAULT_XNDRJS_DOMAIN_ZOD_VERSION = "0.4.0-alpha.1";
 
 const XNDRJS_PACKAGES = {
   domain: "@xndrjs/domain",
@@ -33,22 +33,28 @@ function compareSemver(a: SemverTriple, b: SemverTriple): number {
   return 0;
 }
 
-function maxSemverTriple(versions: SemverTriple[]): SemverTriple | null {
-  return versions.reduce<SemverTriple | null>((max, current) => {
-    if (!max || compareSemver(current, max) > 0) {
-      return current;
-    }
+function stripRangePrefix(version: string): string {
+  return version.trim().replace(/^[\^~>=<]+/, "");
+}
 
-    return max;
-  }, null);
+function hasPrerelease(version: string): boolean {
+  return /-\w/.test(stripRangePrefix(version));
 }
 
 function formatResolvedVersion(
   maxVersion: SemverTriple | null,
+  maxRawVersion: string | null,
   fallback: string,
 ): string {
-  if (!maxVersion) {
+  if (!maxVersion || !maxRawVersion) {
     return fallback;
+  }
+
+  const normalized = stripRangePrefix(maxRawVersion);
+
+  // Pin prereleases exactly (e.g. 0.4.0-alpha.1); caret ranges drop tags.
+  if (hasPrerelease(normalized)) {
+    return normalized;
   }
 
   return `^${maxVersion.join(".")}`;
@@ -118,12 +124,24 @@ function resolveWorkspacePackageVersion(
     (packageJsonPath) =>
       collectPackageVersionsFromPackageJson(packageJsonPath, packageName),
   );
-  const parsedVersions = declaredVersions
-    .map(parseSemverTriple)
-    .filter((version): version is SemverTriple => version !== null);
-  const maxVersion = maxSemverTriple(parsedVersions);
 
-  return formatResolvedVersion(maxVersion, fallback);
+  let maxVersion: SemverTriple | null = null;
+  let maxRawVersion: string | null = null;
+
+  for (const declaredVersion of declaredVersions) {
+    const triple = parseSemverTriple(declaredVersion);
+
+    if (!triple) {
+      continue;
+    }
+
+    if (!maxVersion || compareSemver(triple, maxVersion) > 0) {
+      maxVersion = triple;
+      maxRawVersion = declaredVersion;
+    }
+  }
+
+  return formatResolvedVersion(maxVersion, maxRawVersion, fallback);
 }
 
 export function resolveWorkspaceXndrjsDomainVersion(repoRoot: string): string {

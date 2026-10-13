@@ -24,7 +24,7 @@ Do not duplicate that document in chat—summarize and link when needed.
 | Boundary / forbidden-import violation; ban new framework/SDK in core  | `clean-monorepo-boundaries`                 |
 | Plop generator, template `.hbs`, `plopfile.cjs`, `pnpm generate`      | `clean-monorepo-plop`                       |
 | `*.shape.ts`, `*.primitive.ts`, `*.proof.ts`, `@xndrjs/domain-zod`    | `clean-monorepo-core-models`                |
-| `*.capabilities.ts`, `forShape` / `forPrimitive`, `.attach`           | `clean-monorepo-core-capabilities`          |
+| `*.capabilities.ts`, `forShapeKit` / `forPrimitiveKit` (or Contract)  | `clean-monorepo-core-capabilities`          |
 | `*.service.ts`, cross-model pure domain functions                     | `clean-monorepo-core-services`              |
 | `*.port.ts`, role-oriented outbound contracts (no vendors in core)    | `clean-monorepo-core-ports`                 |
 | `apps/*/composition/`, wiring, app- vs request-scoped infra           | `clean-monorepo-composition-root`           |

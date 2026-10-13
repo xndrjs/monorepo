@@ -27,7 +27,7 @@ When updating skills:
 | Multi-layer feature (SPEC → kits → infra → composition)      | `clean-monorepo-feature-workflow`      |
 | Domain kits (`*.shape.ts` / `*.primitive.ts` / `*.proof.ts`) | `clean-monorepo-core-models`           |
 | Domain errors (`errors/*.error.ts`)                          | `clean-monorepo-plop` (`domain-error`) |
-| Capabilities (`forShape` / `forPrimitive`, `.attach`)        | `clean-monorepo-core-capabilities`     |
+| Capabilities (`forShapeKit` / `forPrimitiveKit`)             | `clean-monorepo-core-capabilities`     |
 | Domain services (`*.service.ts`)                             | `clean-monorepo-core-services`         |
 | Ports (role-oriented)                                        | `clean-monorepo-core-ports`            |
 | Composition roots                                            | `clean-monorepo-composition-root`      |

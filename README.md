@@ -106,7 +106,7 @@ Available generators:
 
 - `core-feature`: creates a `@core/<feature>` package under `packages/core-<feature>` with `@xndrjs/domain` + `@xndrjs/domain-zod` (no `foundation/`).
 - `primitive` / `shape` / `proof`: domain kits under an existing core package (`*.primitive.ts`, `*.shape.ts`, `*.proof.ts`).
-- `capabilities`: domain capabilities (`forShape` / `forPrimitive`; `.attach` is manual) under an existing core package.
+- `capabilities`: domain capabilities (`forShapeKit` / `forPrimitiveKit`) under an existing core package.
 - `domain-error`: domain error class under `errors/` (`*.error.ts`).
 - `core-port`: creates a port interface under an existing core package.
 - `core-use-case`: creates a use case under an existing core package.
@@ -218,7 +218,7 @@ packages/core-billing/operations/user.capabilities.ts
 packages/core-billing/errors/user-not-found.error.ts
 ```
 
-The `capabilities` generator asks for an existing core package, a name, and a base type (`shape` or `primitive`). It scaffolds `{{name}}.capabilities.ts` with `{{Name}}Capabilities` (`forShape` / `forPrimitive`). Wire `.attach(XxxShape|Primitive)` manually after generate.
+The `capabilities` generator asks for an existing core package, a name, and a base type (`shape` or `primitive`). It scaffolds `{{name}}.capabilities.ts` with `{{Name}}Capabilities` via `forShapeKit` / `forPrimitiveKit` (imports the matching model kit; already bound, no separate `.attach`).
 
 The `domain-error` generator asks for an existing core package, an error name, code, and message. It scaffolds `errors/{{name}}.error.ts` and updates the `errors/index.ts` barrel.
 
@@ -335,19 +335,19 @@ Task-specific guides live in [`.skills/`](./.skills/) (canonical). Symlinks expo
 
 **Plop MCP:** [`.mcp.json`](./.mcp.json) registers `clean-monorepo-plop` for Cursor and Claude (`.cursor/mcp.json` is a symlink). See [tools/mcp-server/README.md](./tools/mcp-server/README.md).
 
-| Skill                                | Scope                                         |
-| ------------------------------------ | --------------------------------------------- |
-| `clean-architecture-monorepo`        | Router + link to full architecture doc        |
-| `clean-monorepo-spec-map`            | Multi-capability / god-spec decomposition     |
-| `clean-monorepo-feature-workflow`    | Multi-layer feature implementation            |
-| `clean-monorepo-composition-root`    | App composition wiring (generator-only)       |
-| `clean-monorepo-core-package-design` | Core package naming and bounded context       |
-| `clean-monorepo-boundaries`          | ESLint boundaries                             |
-| `clean-monorepo-plop`                | Plop generators                               |
-| `clean-monorepo-core-models`         | Domain kits (`shape` / `primitive` / `proof`) |
-| `clean-monorepo-core-capabilities`   | `forShape` / `forPrimitive` capabilities      |
-| `clean-monorepo-core-services`       | Cross-model domain services                   |
-| `clean-monorepo-core-ports`          | Role-oriented ports (no vendors in core)      |
+| Skill                                | Scope                                          |
+| ------------------------------------ | ---------------------------------------------- |
+| `clean-architecture-monorepo`        | Router + link to full architecture doc         |
+| `clean-monorepo-spec-map`            | Multi-capability / god-spec decomposition      |
+| `clean-monorepo-feature-workflow`    | Multi-layer feature implementation             |
+| `clean-monorepo-composition-root`    | App composition wiring (generator-only)        |
+| `clean-monorepo-core-package-design` | Core package naming and bounded context        |
+| `clean-monorepo-boundaries`          | ESLint boundaries                              |
+| `clean-monorepo-plop`                | Plop generators                                |
+| `clean-monorepo-core-models`         | Domain kits (`shape` / `primitive` / `proof`)  |
+| `clean-monorepo-core-capabilities`   | `forShapeKit` / `forPrimitiveKit` capabilities |
+| `clean-monorepo-core-services`       | Cross-model domain services                    |
+| `clean-monorepo-core-ports`          | Role-oriented ports (no vendors in core)       |
 
 ## Architectural Boundaries
 
