@@ -1,1 +1,9 @@
-../.mcp/mcp.json
+{
+  "mcpServers": {
+    "plop": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["--dir", "${workspaceFolder}", "mcp:plop"]
+    }
+  }
+}

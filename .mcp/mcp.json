@@ -1,8 +1,1 @@
-{
-  "mcpServers": {
-    "plop": {
-      "command": "pnpm",
-      "args": ["mcp:plop"]
-    }
-  }
-}
+../.cursor/mcp.json
